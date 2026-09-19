@@ -24,12 +24,12 @@ Afvinken per regel; datum + bevinding erachter.
 | # | Taak | Status | Notitie |
 |---|------|--------|---------|
 | 2.1 | `gecko_android.strict_min_version` in Firefox-manifest | ✅ | |
-| 2.2 | Mobiele drempels: portret-viewport haalt `mainVideoMinAreaRatio` (0.32) niet — 16:9 op volle breedte ≈ 0.26 | ⬜ | **blokker**, zie onder |
-| 2.3 | `generic.mobile`-blok in config + oriëntatie-/pointer-detectie in de engine | ⬜ | data, geen nieuwe engine |
-| 2.4 | Popup op smal scherm: panelen, dropdown, knoppen bruikbaar met vinger | ⬜ | |
+| 2.2 | Mobiele drempels: portret-viewport haalt `mainVideoMinAreaRatio` (0.32) niet — 16:9 op volle breedte ≈ 0.26 | ✅ | `generic.mobile` zet hem op 0.14 |
+| 2.3 | `generic.mobile`-blok in config + oriëntatie-/pointer-detectie in de engine | ✅ | `isMobileViewport()` + `refreshTuning()` per apply |
+| 2.4 | Popup op smal scherm: panelen, dropdown, knoppen bruikbaar met vinger | ✅ | media query op `max-width: 480px` / `pointer: coarse` |
 | 2.5 | Testen op toestel: `web-ext run -t firefox-android` of `about:debugging` via USB | ⬜ | |
 | 2.6 | Checklist draaien op mobiel; mobiel-specifieke rijen toevoegen | ⬜ | |
-| 2.7 | Accu/CPU: MutationObserver + 1s-interval meten op telefoon | ⬜ | evt. interval verlengen op mobiel |
+| 2.7 | Accu/CPU: MutationObserver + 1s-interval meten op telefoon | 🟡 | verborgen tab doet nu niets meer; meten moet nog |
 
 ## Fase 3 — Publiceren
 
@@ -43,7 +43,7 @@ Afvinken per regel; datum + bevinding erachter.
 
 ---
 
-## Bekende blokker (2.2)
+## Drempels (2.2 / 2.3)
 
 `isMainPlayerVideo()` rekent viewport-relatief. Op een telefoon in portret haalt een
 16:9-speler over de volle breedte:
@@ -51,9 +51,15 @@ Afvinken per regel; datum + bevinding erachter.
 - oppervlakratio ≈ `1.0 × 0.5625 × (vw/vh)` ≈ **0.26** bij een 9:19.5-scherm → onder `mainVideoMinAreaRatio: 0.32`
 - hoogteratio ≈ **0.26** → onder `mainVideoMinHeightRatio: 0.32`
 
-Gevolg: on-page breedbeeld doet niets op een staande telefoon. Fullscreen (liggend)
-werkt wel, want dat loopt via de fullscreen-tak. Oplossing in 2.3: aparte drempels
-zodra het scherm portret is of `pointer: coarse` geldt.
+Gevolg: on-page breedbeeld deed niets op een staande telefoon. Fullscreen (liggend)
+werkte wel, want dat loopt via de fullscreen-tak.
+
+Opgelost met `generic.mobile` in de config. De engine schakelt om zodra
+`pointer: coarse` geldt of de viewport ≤ `mobileMaxViewportWidth` (820px) is, en
+herberekent dat bij elke apply — dus ook bij draaien van het toestel.
+
+Met de nieuwe waarden haalt dezelfde speler 0.2535 ≥ `0.14`: wel breedbeeld.
+De getallen zijn een eerste gok; afstellen gebeurt op een echt toestel (2.5/2.6).
 
 ---
 

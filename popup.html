@@ -214,6 +214,51 @@
         border-radius: 999px;
         padding: 0 6px;
       }
+
+      /* Firefox for Android opens the popup as a full page: finger-sized. */
+      @media (max-width: 480px), (pointer: coarse) {
+        body {
+          font-size: 15px;
+          padding: 16px;
+        }
+
+        input[type="checkbox"] {
+          width: 22px;
+          height: 22px;
+        }
+
+        button,
+        .lang-row select,
+        input[type="url"],
+        input[type="text"] {
+          min-height: 40px;
+          padding: 8px 12px;
+        }
+
+        summary {
+          padding: 6px 0;
+          font-size: 15px;
+        }
+
+        #typeList label {
+          padding: 10px 0;
+          font-size: 14px;
+        }
+
+        #blacklistList {
+          max-height: none;
+        }
+
+        #blacklistList li {
+          padding: 10px 0;
+          font-size: 14px;
+        }
+
+        #blacklistList li button {
+          padding: 6px 10px;
+          font-size: 13px;
+        }
+      }
     </style>
   </head>
   <body>

@@ -1,5 +1,5 @@
 {
-  "version": 12,
+  "version": 13,
   "updatedAt": "2026-09-19",
   "generic": {
     "embedStretchHosts": "viduki\\.net|embedsports\\.me",
@@ -11,7 +11,21 @@
     "embedMinHeight": 270,
     "embedVideoMinAreaRatio": 0.45,
     "iframeMinAreaRatio": 0.18,
-    "iframeMaxHeightVh": 0.8
+    "iframeMaxHeightVh": 0.8,
+    "mobileMaxViewportWidth": 820,
+    "mobile": {
+      "mainVideoMinAreaRatio": 0.14,
+      "mainVideoMinWidthRatio": 0.7,
+      "mainVideoMinHeightRatio": 0.1,
+      "mainVideoMinWidth": 240,
+      "mainVideoMinHeight": 120,
+      "pseudoFsMinCoverRatio": 0.85,
+      "embedMinWidth": 280,
+      "embedMinHeight": 140,
+      "embedVideoMinAreaRatio": 0.25,
+      "iframeMinAreaRatio": 0.08,
+      "iframeMaxHeightVh": 0.6
+    }
   },
   "overrides": [
     {

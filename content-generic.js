@@ -31,7 +31,28 @@
     embedVideoMinAreaRatio: 0.45,
     iframeMinAreaRatio: 0.18,
     iframeMaxHeightVh: 0.8,
+    mobileMaxViewportWidth: 820,
+    mobile: {
+      mainVideoMinAreaRatio: 0.14,
+      mainVideoMinWidthRatio: 0.7,
+      mainVideoMinHeightRatio: 0.1,
+      mainVideoMinWidth: 240,
+      mainVideoMinHeight: 120,
+      pseudoFsMinCoverRatio: 0.85,
+      embedMinWidth: 280,
+      embedMinHeight: 140,
+      embedVideoMinAreaRatio: 0.25,
+      iframeMinAreaRatio: 0.08,
+      iframeMaxHeightVh: 0.6,
+    },
   };
+
+  /**
+   * Thresholds in use right now. On a phone in portrait a 16:9 player across
+   * the full width covers only ~0.26 of the viewport, well under the desktop
+   * minimum, so the mobile block replaces those numbers.
+   */
+  let tuning = generic;
 
   const inIframe = window !== window.top;
   let applyTimer = 0;
@@ -131,6 +152,25 @@
     );
   }
 
+  function isMobileViewport() {
+    try {
+      if (window.matchMedia?.("(pointer: coarse)")?.matches) return true;
+    } catch {
+      /* no matchMedia */
+    }
+    const width = window.innerWidth || 0;
+    return width > 0 && width <= (generic.mobileMaxViewportWidth ?? 820);
+  }
+
+  /** Recomputed per apply: orientation and window size can change. */
+  function refreshTuning() {
+    const mobile = generic.mobile;
+    tuning =
+      mobile && typeof mobile === "object" && isMobileViewport()
+        ? { ...generic, ...mobile }
+        : generic;
+  }
+
   function viewportSize() {
     return {
       vw: window.innerWidth || 1,
@@ -142,11 +182,12 @@
     const { vw, vh } = viewportSize();
     const w = video.clientWidth;
     const h = video.clientHeight;
-    if (w < 280 || h < 160) return false;
+    if (w < (tuning.mainVideoMinWidth ?? 280)) return false;
+    if (h < (tuning.mainVideoMinHeight ?? 160)) return false;
     const areaRatio = (w * h) / (vw * vh);
-    const minArea = generic.mainVideoMinAreaRatio ?? 0.32;
-    const minW = generic.mainVideoMinWidthRatio ?? 0.5;
-    const minH = generic.mainVideoMinHeightRatio ?? 0.32;
+    const minArea = tuning.mainVideoMinAreaRatio ?? 0.32;
+    const minW = tuning.mainVideoMinWidthRatio ?? 0.5;
+    const minH = tuning.mainVideoMinHeightRatio ?? 0.32;
     return areaRatio >= minArea || (w / vw >= minW && h / vh >= minH);
   }
 
@@ -181,7 +222,7 @@
   function findPseudoFullscreenRoot(video) {
     if (!video || isFullscreen()) return null;
     const { vw, vh } = viewportSize();
-    const minCover = generic.pseudoFsMinCoverRatio ?? 0.92;
+    const minCover = tuning.pseudoFsMinCoverRatio ?? 0.92;
 
     let el = video;
     while (el && el !== document.documentElement) {
@@ -189,8 +230,8 @@
       if (
         r.width >= vw * minCover &&
         r.height >= vh * minCover &&
-        r.width >= 280 &&
-        r.height >= 160
+        r.width >= (tuning.mainVideoMinWidth ?? 280) &&
+        r.height >= (tuning.mainVideoMinHeight ?? 160)
       ) {
         if (el === document.body) return null;
         return el;
@@ -236,14 +277,14 @@
   function isPlayerSizedEmbed() {
     if (!inIframe) return false;
     const { vw, vh } = viewportSize();
-    const minW = generic.embedMinWidth ?? 480;
-    const minH = generic.embedMinHeight ?? 270;
+    const minW = tuning.embedMinWidth ?? 480;
+    const minH = tuning.embedMinHeight ?? 270;
     if (vw < minW || vh < minH) return false;
 
     const video = primaryVideo();
     if (!video) return false;
 
-    const minArea = generic.embedVideoMinAreaRatio ?? 0.45;
+    const minArea = tuning.embedVideoMinAreaRatio ?? 0.45;
     const areaRatio =
       (video.clientWidth * video.clientHeight) / (vw * vh);
     return areaRatio >= minArea || isMainPlayerVideo(video);
@@ -480,7 +521,8 @@
       return false;
     }
     const r = root.getBoundingClientRect();
-    if (r.width < 280 || r.height < 160) return false;
+    if (r.width < (tuning.mainVideoMinWidth ?? 280)) return false;
+    if (r.height < (tuning.mainVideoMinHeight ?? 160)) return false;
     let pos = "static";
     try {
       pos = getComputedStyle(root).position;
@@ -600,12 +642,12 @@
     if (!iframe || iframe.closest(`[${MARK}="ignore"]`)) return false;
     const r = iframe.getBoundingClientRect();
     const { vw, vh } = viewportSize();
-    const minW = generic.embedMinWidth ?? 480;
-    const minH = (generic.embedMinHeight ?? 270) * 0.65;
+    const minW = tuning.embedMinWidth ?? 480;
+    const minH = (tuning.embedMinHeight ?? 270) * 0.65;
     if (r.width < minW * 0.85 || r.height < minH) return false;
 
     const areaRatio = (r.width * r.height) / (vw * vh);
-    const minArea = generic.iframeMinAreaRatio ?? 0.18;
+    const minArea = tuning.iframeMinAreaRatio ?? 0.18;
     if (areaRatio < minArea && !isSafeEmbedHost(iframeSrcText(iframe))) {
       return false;
     }
@@ -639,11 +681,11 @@
     if (!iframe) return null;
 
     const { vh } = viewportSize();
-    const maxVh = generic.iframeMaxHeightVh ?? 0.8;
+    const maxVh = tuning.iframeMaxHeightVh ?? 0.8;
     const rect = iframe.getBoundingClientRect();
     const targetH = Math.max(
       rect.height,
-      Math.min(vh * maxVh, Math.max(rect.width * 0.5625, generic.embedMinHeight ?? 270))
+      Math.min(vh * maxVh, Math.max(rect.width * 0.5625, tuning.embedMinHeight ?? 270))
     );
 
     markFill(
@@ -738,6 +780,7 @@
   }
 
   function apply() {
+    refreshTuning();
     if (remoteCfg) WsFillConfig.applySiteOverrides(remoteCfg);
     watchHintedPlayers();
 
@@ -836,6 +879,8 @@
   });
 
   function scheduleApply() {
+    // A hidden tab cannot show anything; re-apply when it comes back instead.
+    if (document.hidden) return;
     if (applyTimer) return;
     applyTimer = window.setTimeout(() => {
       applyTimer = 0;
@@ -892,6 +937,12 @@
     }
   }
 
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) return;
+    lastAppliedKey = "";
+    scheduleApply();
+  });
+
   document.addEventListener("fullscreenchange", () => {
     lastAppliedKey = "";
     apply();
@@ -921,7 +972,7 @@
 
   let lastUrl = location.href;
   setInterval(() => {
-    if (!enabled) return;
+    if (!enabled || document.hidden) return;
     if (location.href !== lastUrl) {
       lastUrl = location.href;
       lastAppliedKey = "";
@@ -939,7 +990,14 @@
   async function boot() {
     try {
       remoteCfg = await WsFillConfig.get();
-      if (remoteCfg?.generic) generic = { ...generic, ...remoteCfg.generic };
+      if (remoteCfg?.generic) {
+        generic = {
+          ...generic,
+          ...remoteCfg.generic,
+          mobile: { ...generic.mobile, ...(remoteCfg.generic.mobile || {}) },
+        };
+      }
+      refreshTuning();
       WsFillConfig.applySiteOverrides(remoteCfg);
       bindOverrideEvents();
       watchHintedPlayers();
@@ -985,7 +1043,12 @@
     if (area === "local" && changes.remoteConfig?.newValue) {
       remoteCfg = WsFillConfig.normalizeConfig(changes.remoteConfig.newValue);
       if (remoteCfg?.generic) {
-        generic = { ...generic, ...remoteCfg.generic };
+        generic = {
+          ...generic,
+          ...remoteCfg.generic,
+          mobile: { ...generic.mobile, ...(remoteCfg.generic.mobile || {}) },
+        };
+        refreshTuning();
       }
       WsFillConfig.applySiteOverrides(remoteCfg);
       bindOverrideEvents();

@@ -105,6 +105,21 @@ Alternatief DRM als Netflix niet kan: Disney+/Prime/other — noteer welke.
 
 ---
 
+## H. Mobiel (Firefox Android)
+
+| # | Scenario | Verwacht | Score | Notitie |
+|---|----------|----------|-------|---------|
+| 31 | Telefoon **portret**, grote on-page speler | Breedbeeld (mobiele drempels actief) | | |
+| 32 | Telefoon **landschap** / fullscreen | Breedbeeld, controls bruikbaar | | |
+| 33 | Toestel draaien tijdens afspelen | Schakelt mee zonder herladen | | |
+| 34 | Portrait-clip op mobiel | Geen breed-fill | | |
+| 35 | Kleine preview in feed op mobiel | Geen stretch | | |
+| 36 | Popup op telefoon | Vinkjes/knoppen met vinger te raken, geen horizontale scroll | | |
+| 37 | Tab naar achtergrond, later terug | Geen werk in de achtergrond; bij terugkeer meteen correct | | |
+| 38 | Accu/CPU tijdens 10 min video | Geen merkbare extra belasting | | |
+
+---
+
 ## Snelle smoke (5 min)
 
 Minimaal vóór een release:

@@ -43,6 +43,17 @@ Eén generieke engine + remote overrides. Geen site-specifieke content scripts.
 | `activeClass` | body/html-class terwijl stretch aan staat |
 | `events` | extra DOM-events die opnieuw apply’en |
 
+### Mobiele drempels
+
+`generic.mobile` overschrijft de drempels zodra de engine een mobiele viewport
+ziet: `pointer: coarse`, of een viewport smaller dan `generic.mobileMaxViewportWidth`
+(standaard 820px). Dat wordt per apply herbepaald, dus draaien van het toestel
+schakelt vanzelf mee.
+
+Nodig omdat de drempels viewport-relatief zijn: een 16:9-speler over de volle
+breedte van een staande telefoon dekt maar ~0.26 van het scherm, onder de
+desktopdrempel van 0.32. Alles wat in `generic` mag, mag ook in `generic.mobile`.
+
 Nieuwe hardnekkige site = config-update, geen store-release.
 
 ## URL blacklist
