@@ -28,7 +28,7 @@ Afvinken per regel; datum + bevinding erachter.
 | 2.3 | `generic.mobile`-blok in config + oriëntatie-/pointer-detectie in de engine | ✅ | `isMobileViewport()` + `refreshTuning()` per apply |
 | 2.4 | Popup op smal scherm: panelen, dropdown, knoppen bruikbaar met vinger | ✅ | media query op `max-width: 480px` / `pointer: coarse` |
 | 2.5 | Testen op toestel: `web-ext run -t firefox-android` of `about:debugging` via USB | ⬜ | |
-| 2.6 | Checklist draaien op mobiel; mobiel-specifieke rijen toevoegen | ⬜ | |
+| 2.6 | Checklist draaien op mobiel; mobiel-specifieke rijen toevoegen | 🟡 | bevinding: knoppen in YouTube-fullscreen reageerden niet — zie onder |
 | 2.7 | Accu/CPU: MutationObserver + 1s-interval meten op telefoon | 🟡 | verborgen tab doet nu niets meer; meten moet nog |
 
 ## Fase 3 — Publiceren
@@ -60,6 +60,30 @@ herberekent dat bij elke apply — dus ook bij draaien van het toestel.
 
 Met de nieuwe waarden haalt dezelfde speler 0.2535 ≥ `0.14`: wel breedbeeld.
 De getallen zijn een eerste gok; afstellen gebeurt op een echt toestel (2.5/2.6).
+
+---
+
+## Bevinding: knoppen reageren niet in fullscreen (mobiel)
+
+Firefox Android, YouTube in fullscreen: instellingenknop en andere knoppen
+reageerden niet meer met de extensie aan.
+
+Verdachte: deep fill pinde `video.parentElement` als `position:absolute; inset:0`.
+Zit de spelerbediening in dezelfde wrapper (of komt die wrapper later in de DOM),
+dan ligt er een transparante laag over de knoppen die alle taps opvangt.
+
+Aangepast in 1.17.0:
+
+1. Een wrapper met bedieningselementen (`button`, `a[href]`, `[role=button]`,
+   `[tabindex]`, …) wordt nooit meer gepind.
+2. Een wrapper die we tóch pinnen krijgt `pointer-events: none`; de `<video>`
+   krijgt `pointer-events: auto` terug.
+3. Nieuwe knop `deepFillContainer` — op mobiel standaard `false`, dus daar wordt
+   alleen de `<video>` zelf gevuld.
+
+Bevestigen: helpt dit niet, dan ligt het niet aan de wrapper maar aan de
+override-CSS of aan het `<video>`-element zelf, en is de volgende stap
+`deepFill` op mobiel helemaal uitzetten.
 
 ---
 

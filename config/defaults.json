@@ -1,6 +1,6 @@
 {
-  "version": 13,
-  "updatedAt": "2026-09-19",
+  "version": 14,
+  "updatedAt": "2026-09-20",
   "generic": {
     "embedStretchHosts": "viduki\\.net|embedsports\\.me",
     "mainVideoMinAreaRatio": 0.32,
@@ -24,8 +24,10 @@
       "embedMinHeight": 140,
       "embedVideoMinAreaRatio": 0.25,
       "iframeMinAreaRatio": 0.08,
-      "iframeMaxHeightVh": 0.6
-    }
+      "iframeMaxHeightVh": 0.6,
+      "deepFillContainer": false
+    },
+    "deepFillContainer": true
   },
   "overrides": [
     {

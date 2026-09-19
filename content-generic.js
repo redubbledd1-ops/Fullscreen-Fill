@@ -31,6 +31,7 @@
     embedVideoMinAreaRatio: 0.45,
     iframeMinAreaRatio: 0.18,
     iframeMaxHeightVh: 0.8,
+    deepFillContainer: true,
     mobileMaxViewportWidth: 820,
     mobile: {
       mainVideoMinAreaRatio: 0.14,
@@ -44,6 +45,7 @@
       embedVideoMinAreaRatio: 0.25,
       iframeMinAreaRatio: 0.08,
       iframeMaxHeightVh: 0.6,
+      deepFillContainer: false,
     },
   };
 
@@ -512,6 +514,20 @@
     markFill(el, props, "wrap");
   }
 
+  const CONTROL_SELECTOR =
+    "button, a[href], input, select, textarea, [role=\"button\"], " +
+    "[role=\"slider\"], [role=\"menu\"], [role=\"menuitem\"], [tabindex]";
+
+  /** A wrapper that holds controls is part of the player UI, not a letterbox. */
+  function holdsControls(el) {
+    if (!el) return false;
+    try {
+      return Boolean(el.querySelector(CONTROL_SELECTOR));
+    } catch {
+      return false;
+    }
+  }
+
   /**
    * Absolute fill needs the player shell to be the containing block and to have
    * a usable box. Make it position:relative when it is static.
@@ -593,7 +609,16 @@
     if (!canAnchorFill(root)) return;
 
     const container = video.parentElement;
-    if (container && root.contains(container) && container !== root) {
+    const pinContainer =
+      (tuning.deepFillContainer ?? true) &&
+      container &&
+      root.contains(container) &&
+      container !== root &&
+      // Pinning a node that also holds the play/settings buttons turns it into
+      // a transparent overlay on top of them, which swallows clicks and taps.
+      !holdsControls(container);
+
+    if (pinContainer) {
       markFill(
         container,
         {
@@ -604,6 +629,8 @@
           width: "100%",
           height: "100%",
           transform: "none",
+          // A box we forced over the player must never take input itself.
+          "pointer-events": "none",
         },
         "wrap"
       );
@@ -621,6 +648,8 @@
       transform: "none",
       "object-fit": "fill",
       "object-position": "center center",
+      // Undo the wrapper's pointer-events:none for the video itself.
+      "pointer-events": "auto",
     });
   }
 
