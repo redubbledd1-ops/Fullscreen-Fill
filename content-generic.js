@@ -288,18 +288,48 @@
     return WsFillConfig.portraitState(video);
   }
 
-  function clearMarkedStyles() {
-    document.querySelectorAll(`[${MARK}]`).forEach((el) => {
-      WsFillConfig.clearVideoStretch(el);
-      el.removeAttribute(MARK);
+  /**
+   * Inline styles we overwrote, per element: prop -> what the page had there.
+   * Players (YouTube writes width/height/left/top straight onto the <video>)
+   * size themselves with inline styles, so undo must put those values back
+   * instead of deleting the property.
+   */
+  const originalInline = new WeakMap();
+
+  function rememberInline(el, prop) {
+    let saved = originalInline.get(el);
+    if (!saved) {
+      saved = new Map();
+      originalInline.set(el, saved);
+    }
+    if (saved.has(prop)) return;
+    saved.set(prop, {
+      value: el.style.getPropertyValue(prop),
+      priority: el.style.getPropertyPriority(prop),
     });
   }
 
+  /** Undo only our own properties on this element; leave the rest alone. */
+  function restoreFill(el) {
+    if (!el) return;
+    const saved = originalInline.get(el);
+    if (saved) {
+      for (const [prop, prev] of saved) {
+        if (prev.value) el.style.setProperty(prop, prev.value, prev.priority);
+        else el.style.removeProperty(prop);
+      }
+      originalInline.delete(el);
+    }
+    el.removeAttribute(MARK);
+  }
+
+  function clearMarkedStyles() {
+    document.querySelectorAll(`[${MARK}]`).forEach(restoreFill);
+  }
+
   function clearAllVideoStretch() {
+    // Marked elements only: an untouched <video> keeps whatever the site set.
     clearMarkedStyles();
-    document
-      .querySelectorAll("video")
-      .forEach((v) => WsFillConfig.clearVideoStretch(v));
   }
 
   function markFill(el, props, kind = "1") {
@@ -307,6 +337,7 @@
     el.setAttribute(MARK, kind);
     for (const [prop, value] of Object.entries(props)) {
       if (value === "" || value == null) continue;
+      rememberInline(el, prop);
       el.style.setProperty(prop, value, "important");
     }
   }
@@ -638,13 +669,13 @@
 
     document.querySelectorAll("video").forEach((video) => {
       if (!inIframe && !fsOrPseudo && !isMainPlayerVideo(video)) {
-        WsFillConfig.clearVideoStretch(video);
+        restoreFill(video);
         return;
       }
 
       const state = WsFillConfig.portraitState(video);
       if (state === true) {
-        WsFillConfig.clearVideoStretch(video);
+        restoreFill(video);
         return;
       }
       if (state === null) {
