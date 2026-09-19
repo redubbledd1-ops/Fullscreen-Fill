@@ -69,6 +69,25 @@ welk type de huidige tab draait en waarom breedbeeld wel/niet actief is.
 Opslag: `chrome.storage.sync` sleutel `playerTypes` (`{ native, mse, drm, embed }`,
 alles wat niet expliciet `false` is staat aan).
 
+## Taal
+
+De popup kiest zijn taal **automatisch** uit de browsertaal
+(`chrome.i18n.getUILanguage()`). Met het uitklapmenu bovenin is dat te
+overrulen; de keuze staat in `chrome.storage.sync` onder `uiLang`
+(`auto` | `en` | `nl` | `de` | `fr` | `es`) en geldt dus op al je apparaten.
+
+Alle popup-teksten staan in [i18n.js](i18n.js) (`WsFillI18n.MESSAGES`). Statische
+markup wordt vertaald via `data-i18n`, `data-i18n-placeholder` en
+`data-i18n-title`; dynamische teksten via `WsFillI18n.t(key, vars, locale)`.
+
+Nieuwe taal toevoegen: één blok in `MESSAGES` + een naam in `LOCALE_NAMES`. De
+sleutelset moet gelijk zijn aan `en` (die is de fallback bij een ontbrekende
+sleutel).
+
+`_locales/` bevat alleen de store-naam en -omschrijving (`__MSG_extName__` /
+`__MSG_extDesc__` in het manifest) — dat is wat Chrome zelf vertaalt en kan niet
+tijdens runtime worden gewisseld.
+
 ## Remote config
 
 Popup → **URL check**: optionele remote `config.json`. Elke 6 uur + **Nu controleren**.

@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Widescreen Fill",
+    "description": "Extension name shown in the store and browser."
+  },
+  "extDesc": {
+    "message": "Rek landscape-video's uit tot breedbeeld. URL-blacklist, spelertype-filter en remote config.",
+    "description": "Extension description shown in the store."
+  }
+}

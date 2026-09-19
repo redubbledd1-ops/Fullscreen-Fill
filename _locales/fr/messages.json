@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Widescreen Fill",
+    "description": "Extension name shown in the store and browser."
+  },
+  "extDesc": {
+    "message": "Étire les vidéos en paysage pour remplir l'écran. Liste noire d'URL, filtre par type de lecteur et config distante.",
+    "description": "Extension description shown in the store."
+  }
+}

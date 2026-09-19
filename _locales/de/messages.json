@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Widescreen Fill",
+    "description": "Extension name shown in the store and browser."
+  },
+  "extDesc": {
+    "message": "Landscape-Videos auf Breitbild strecken. URL-Sperrliste, Playertyp-Filter und Remote-Config.",
+    "description": "Extension description shown in the store."
+  }
+}

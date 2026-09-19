@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Widescreen Fill",
+    "description": "Extension name shown in the store and browser."
+  },
+  "extDesc": {
+    "message": "Stretch landscape videos to fill the screen. Per-site blacklist, player-type filter and remote config.",
+    "description": "Extension description shown in the store."
+  }
+}

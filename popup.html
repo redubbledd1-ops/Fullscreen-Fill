@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>Widescreen Fill</title>
@@ -57,6 +57,25 @@
         font: inherit;
       }
 
+      .lang-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        font-size: 12px;
+      }
+
+      .lang-row span {
+        opacity: 0.85;
+      }
+
+      .lang-row select {
+        flex: 1;
+        min-width: 0;
+        font: inherit;
+        padding: 4px 6px;
+      }
+
       .add-row {
         display: flex;
         gap: 6px;
@@ -80,14 +99,6 @@
         overflow: auto;
       }
 
-      #blacklistList:empty::after {
-        content: "Nog geen URL’s geblokkeerd.";
-        display: block;
-        font-size: 12px;
-        opacity: 0.55;
-        padding: 4px 0;
-      }
-
       #blacklistList li {
         display: flex;
         align-items: center;
@@ -96,6 +107,12 @@
         border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
         font-size: 12px;
         word-break: break-all;
+      }
+
+      #blacklistList li.empty {
+        border-bottom: none;
+        opacity: 0.55;
+        padding: 4px 0;
       }
 
       #blacklistList li span {
@@ -199,68 +216,78 @@
     <h1>Widescreen Fill</h1>
     <label class="row">
       <input type="checkbox" id="enabled" />
-      Breedbeeld aan
+      <span data-i18n="enabled">Widescreen on</span>
     </label>
 
-    <p class="meta" id="currentType">Huidige tab: bezig…</p>
+    <label class="lang-row" for="uiLang">
+      <span data-i18n="langLabel">Language</span>
+      <select id="uiLang"></select>
+    </label>
+
+    <p class="meta" id="currentType" data-i18n="tabBusy">
+      Current tab: checking…
+    </p>
 
     <details id="typesPanel">
-      <summary id="typesSummary">Spelertypes</summary>
+      <summary id="typesSummary" data-i18n="types">Player types</summary>
       <div id="typeList"></div>
-      <p class="hint">
-        Uitgevinkt type krijgt nooit breedbeeld, op geen enkele site. Eén type
-        per video, volgorde: DRM → iframe-embed → MSE → native.
-      </p>
+      <p class="hint" data-i18n="typesHint"></p>
     </details>
 
     <details id="blacklistPanel">
-      <summary id="blacklistSummary">URL blacklist</summary>
+      <summary id="blacklistSummary" data-i18n="blacklist">URL blacklist</summary>
       <div class="add-row">
         <input
           type="text"
           id="blacklistInput"
-          placeholder="domein of URL, bijv. example.com"
+          data-i18n-placeholder="blacklistPlaceholder"
           spellcheck="false"
           autocomplete="off"
         />
-        <button type="button" id="blacklistAdd">Add</button>
+        <button type="button" id="blacklistAdd" data-i18n="add">Add</button>
       </div>
       <div class="actions">
-        <button type="button" id="blacklistCurrent">Huidige pagina blokkeren</button>
+        <button type="button" id="blacklistCurrent" data-i18n="blockCurrent">
+          Block current page
+        </button>
       </div>
       <div class="choice" id="currentChoice" hidden>
         <p id="currentChoiceText"></p>
         <div class="actions">
-          <button type="button" id="chooseUrl">Alleen deze URL</button>
-          <button type="button" id="chooseDomain">Heel domain</button>
-          <button type="button" id="chooseCancel">Annuleren</button>
+          <button type="button" id="chooseUrl" data-i18n="chooseUrl">
+            This URL only
+          </button>
+          <button type="button" id="chooseDomain" data-i18n="chooseDomain">
+            Whole domain
+          </button>
+          <button type="button" id="chooseCancel" data-i18n="cancel">
+            Cancel
+          </button>
         </div>
       </div>
       <ul id="blacklistList"></ul>
-      <p class="hint">
-        Typ + Add, of blokkeer de huidige tab en kies URL of domain.
-      </p>
+      <p class="hint" data-i18n="blacklistHint"></p>
     </details>
 
     <details id="urlCheck">
-      <summary>URL check</summary>
-      <label class="block" for="configUrl">Remote config URL (optioneel)</label>
+      <summary data-i18n="urlCheck">URL check</summary>
+      <label class="block" for="configUrl" data-i18n="configUrlLabel"></label>
       <input
         type="url"
         id="configUrl"
         placeholder="https://…/config.json"
         spellcheck="false"
       />
-      <p class="meta" id="status">Config laden…</p>
+      <p class="meta" id="status" data-i18n="configLoading"></p>
       <div class="actions">
-        <button type="button" id="refresh">Nu controleren</button>
+        <button type="button" id="refresh" data-i18n="checkNow">
+          Check now
+        </button>
       </div>
-      <p class="hint">
-        Optioneel: remote selectors bijwerken. Zonder URL blijft de ingebouwde
-        config actief.
-      </p>
+      <p class="hint" data-i18n="urlCheckHint"></p>
     </details>
 
+    <script src="i18n.js"></script>
     <script src="config-client.js"></script>
     <script src="popup.js"></script>
   </body>

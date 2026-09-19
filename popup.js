@@ -1,4 +1,5 @@
 const enabledEl = document.getElementById("enabled");
+const langEl = document.getElementById("uiLang");
 const urlEl = document.getElementById("configUrl");
 const statusEl = document.getElementById("status");
 const refreshBtn = document.getElementById("refresh");
@@ -20,11 +21,18 @@ let urlBlacklist = [];
 let pendingTab = null;
 let playerTypes = WsFillConfig.defaultPlayerTypes();
 let currentType = "";
+let lastState = null;
+let langPref = "auto";
+let locale = WsFillI18n.resolveLocale(langPref);
+
+function t(key, vars) {
+  return WsFillI18n.t(key, vars, locale);
+}
 
 function formatTime(ts) {
   if (!ts) return "—";
   try {
-    return new Date(ts).toLocaleString();
+    return new Date(ts).toLocaleString(locale);
   } catch {
     return "—";
   }
@@ -35,6 +43,90 @@ async function storageSet(values) {
     await chrome.storage.sync.set(values);
   } catch {
     /* ignore quota / context errors */
+  }
+}
+
+function renderLanguages() {
+  langEl.replaceChildren();
+
+  const auto = document.createElement("option");
+  auto.value = "auto";
+  auto.textContent = `${t("langAuto")} — ${WsFillI18n.localeName(
+    WsFillI18n.browserLocale()
+  )}`;
+  langEl.appendChild(auto);
+
+  for (const code of WsFillI18n.LOCALES) {
+    const option = document.createElement("option");
+    option.value = code;
+    option.textContent = WsFillI18n.localeName(code);
+    langEl.appendChild(option);
+  }
+
+  langEl.value = langPref;
+}
+
+/** Re-render everything that carries text. */
+function applyLanguage() {
+  locale = WsFillI18n.resolveLocale(langPref);
+  document.documentElement.lang = locale;
+  WsFillI18n.applyDom(document, locale);
+  renderLanguages();
+  renderPlayerTypes();
+  renderBlacklist();
+  renderCurrentType();
+  renderStatus();
+}
+
+function typeMessageKey(type) {
+  return {
+    native: "typeNative",
+    mse: "typeMse",
+    drm: "typeDrm",
+    embed: "typeEmbed",
+  }[type];
+}
+
+function typeLabel(type) {
+  const key = typeMessageKey(type);
+  return key ? t(key) : type;
+}
+
+function renderPlayerTypes() {
+  typeList.replaceChildren();
+  const off = WsFillConfig.PLAYER_TYPES.filter((type) => playerTypes[type] === false);
+  if (!off.length) typesSummary.textContent = t("types");
+  else if (off.length === 1) typesSummary.textContent = t("typesOffOne");
+  else typesSummary.textContent = t("typesOff", { n: off.length });
+
+  for (const type of WsFillConfig.PLAYER_TYPES) {
+    const label = document.createElement("label");
+    if (type === currentType) label.classList.add("current");
+
+    const box = document.createElement("input");
+    box.type = "checkbox";
+    box.checked = playerTypes[type] !== false;
+    box.addEventListener("change", () => {
+      playerTypes = WsFillConfig.normalizePlayerTypes({
+        ...playerTypes,
+        [type]: box.checked,
+      });
+      storageSet({ playerTypes });
+      renderPlayerTypes();
+    });
+
+    const text = document.createElement("span");
+    text.textContent = typeLabel(type);
+    label.append(box, text);
+
+    if (type === currentType) {
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = t("typeBadge");
+      label.appendChild(badge);
+    }
+
+    typeList.appendChild(label);
   }
 }
 
@@ -56,20 +148,41 @@ function pushEntry(entry) {
   return true;
 }
 
+function describeEntry(entry) {
+  const value = WsFillConfig.normalizeBlacklistEntry(entry);
+  if (value.startsWith("ytid:")) {
+    return t("entryYoutube", { id: value.slice(5) });
+  }
+  if (value.startsWith("domain:")) {
+    return t("entryDomain", { domain: value.slice(7) });
+  }
+  if (value.startsWith("page:")) return value.slice(5);
+  return value;
+}
+
 function renderBlacklist() {
   blacklistList.replaceChildren();
   const count = urlBlacklist.length;
-  blacklistSummary.textContent =
-    count > 0 ? `URL blacklist (${count})` : "URL blacklist";
+  blacklistSummary.textContent = count
+    ? t("blacklistN", { n: count })
+    : t("blacklist");
+
+  if (!count) {
+    const li = document.createElement("li");
+    li.className = "empty";
+    li.textContent = t("emptyList");
+    blacklistList.appendChild(li);
+    return;
+  }
 
   urlBlacklist.forEach((entry, index) => {
     const li = document.createElement("li");
     const label = document.createElement("span");
-    label.textContent = WsFillConfig.displayBlacklistEntry(entry);
+    label.textContent = describeEntry(entry);
     label.title = entry;
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
-    removeBtn.textContent = "Verwijder";
+    removeBtn.textContent = t("remove");
     removeBtn.addEventListener("click", () => {
       urlBlacklist.splice(index, 1);
       saveBlacklist();
@@ -78,75 +191,6 @@ function renderBlacklist() {
     li.append(label, removeBtn);
     blacklistList.appendChild(li);
   });
-}
-
-function renderPlayerTypes() {
-  typeList.replaceChildren();
-  const off = WsFillConfig.PLAYER_TYPES.filter((t) => playerTypes[t] === false);
-  typesSummary.textContent = off.length
-    ? `Spelertypes (${off.length} uit)`
-    : "Spelertypes";
-
-  for (const type of WsFillConfig.PLAYER_TYPES) {
-    const label = document.createElement("label");
-    if (type === currentType) label.classList.add("current");
-
-    const box = document.createElement("input");
-    box.type = "checkbox";
-    box.checked = playerTypes[type] !== false;
-    box.addEventListener("change", () => {
-      playerTypes = WsFillConfig.normalizePlayerTypes({
-        ...playerTypes,
-        [type]: box.checked,
-      });
-      storageSet({ playerTypes });
-      renderPlayerTypes();
-    });
-
-    const text = document.createElement("span");
-    text.textContent = WsFillConfig.playerTypeLabel(type);
-    label.append(box, text);
-
-    if (type === currentType) {
-      const badge = document.createElement("span");
-      badge.className = "badge";
-      badge.textContent = "deze tab";
-      label.appendChild(badge);
-    }
-
-    typeList.appendChild(label);
-  }
-}
-
-function describeState(state) {
-  if (!state?.type) return "Huidige tab: geen speler gevonden";
-  const label = state.typeLabel || state.type;
-  let why = "breedbeeld actief";
-  if (!state.enabled) why = "extensie uit";
-  else if (state.blacklisted) why = "geblacklist";
-  else if (!state.typeAllowed) why = "dit spelertype staat uit";
-  else if (!state.active && state.fullscreenOnly && !state.fullscreen) {
-    why = "alleen in fullscreen";
-  } else if (!state.active) why = "nu niet actief";
-  return `Huidige tab: ${label} · ${why}`;
-}
-
-async function loadCurrentType() {
-  try {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-    const tab = tabs[0];
-    if (!tab?.id) throw new Error("geen tab");
-    const state = await chrome.tabs.sendMessage(tab.id, {
-      type: "wsFillState",
-    });
-    currentType = state?.type || "";
-    currentTypeEl.textContent = describeState(state);
-  } catch {
-    currentType = "";
-    currentTypeEl.textContent =
-      "Huidige tab: onbekend (pagina herladen na update)";
-  }
-  renderPlayerTypes();
 }
 
 function addBlacklistEntry() {
@@ -165,14 +209,24 @@ function showChoice(pageEntry, domainEntry, previewUrl) {
   pendingTab = { pageEntry, domainEntry };
   currentChoiceText.replaceChildren();
   const intro = document.createElement("div");
-  intro.textContent = "Wat wil je blokkeren?";
+  intro.textContent = t("blockWhat");
   const urlLine = document.createElement("div");
-  urlLine.textContent = `Alleen deze URL: ${previewUrl}`;
+  urlLine.textContent = t("blockUrlLine", { url: previewUrl });
   const domainLine = document.createElement("div");
-  domainLine.textContent = `Heel domain: ${domainEntry.replace(/^domain:/, "")}`;
+  domainLine.textContent = t("blockDomainLine", {
+    domain: domainEntry.replace(/^domain:/, ""),
+  });
   currentChoiceText.append(intro, urlLine, domainLine);
   currentChoice.hidden = false;
   currentChoice.classList.add("visible");
+}
+
+function showChoiceMessage(text, blocked) {
+  currentChoiceText.textContent = text;
+  currentChoice.hidden = false;
+  currentChoice.classList.add("visible");
+  chooseUrl.disabled = Boolean(blocked);
+  chooseDomain.disabled = Boolean(blocked);
 }
 
 function parseTabUrl(rawUrl) {
@@ -211,27 +265,64 @@ async function startCurrentPageBlock() {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     const tab = tabs[0];
     if (!tab?.url) {
-      currentChoiceText.textContent = "Geen actieve tab-URL gevonden.";
-      currentChoice.hidden = false;
-      currentChoice.classList.add("visible");
+      showChoiceMessage(t("noTabUrl"), false);
       return;
     }
     const parsed = parseTabUrl(tab.url);
     if (!parsed) {
-      currentChoiceText.textContent =
-        "Deze pagina kan niet geblacklist (chrome:// of interne pagina).";
-      currentChoice.hidden = false;
-      currentChoice.classList.add("visible");
-      chooseUrl.disabled = true;
-      chooseDomain.disabled = true;
+      showChoiceMessage(t("cannotBlock"), true);
       return;
     }
     showChoice(parsed.pageEntry, parsed.domainEntry, parsed.previewUrl);
   } catch (err) {
-    currentChoiceText.textContent = `Kon tab niet lezen: ${err.message || err}`;
-    currentChoice.hidden = false;
-    currentChoice.classList.add("visible");
+    showChoiceMessage(t("tabReadError", { err: err?.message || err }), false);
   }
+}
+
+function renderCurrentType() {
+  if (lastState === null) {
+    currentTypeEl.textContent = t("tabBusy");
+    return;
+  }
+  if (lastState === false) {
+    currentTypeEl.textContent = t("tabUnknown");
+    return;
+  }
+  if (!lastState.type) {
+    currentTypeEl.textContent = t("tabNoPlayer");
+    return;
+  }
+
+  let why = "whyActive";
+  if (!lastState.enabled) why = "whyOff";
+  else if (lastState.blacklisted) why = "whyBlacklisted";
+  else if (!lastState.typeAllowed) why = "whyType";
+  else if (!lastState.active && lastState.fullscreenOnly && !lastState.fullscreen) {
+    why = "whyFsOnly";
+  } else if (!lastState.active) why = "whyInactive";
+
+  currentTypeEl.textContent = t("tabLine", {
+    type: typeLabel(lastState.type),
+    why: t(why),
+  });
+}
+
+async function loadCurrentType() {
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tab = tabs[0];
+    if (!tab?.id) throw new Error("no tab");
+    const state = await chrome.tabs.sendMessage(tab.id, {
+      type: "wsFillState",
+    });
+    lastState = state || false;
+    currentType = state?.type || "";
+  } catch {
+    lastState = false;
+    currentType = "";
+  }
+  renderCurrentType();
+  renderPlayerTypes();
 }
 
 async function renderStatus() {
@@ -242,13 +333,17 @@ async function renderStatus() {
       "configFetchError",
       "configSource",
     ]);
-    const version = data.remoteConfig?.version ?? "?";
-    const source = data.configSource || "bundled";
-    const when = formatTime(data.configFetchedAt);
-    const err = data.configFetchError ? ` · fout: ${data.configFetchError}` : "";
-    statusEl.textContent = `Config v${version} · bron: ${source} · ${when}${err}`;
+    const err = data.configFetchError
+      ? t("configStatusError", { err: data.configFetchError })
+      : "";
+    statusEl.textContent =
+      t("configStatus", {
+        v: data.remoteConfig?.version ?? "?",
+        s: data.configSource || "bundled",
+        t: formatTime(data.configFetchedAt),
+      }) + err;
   } catch {
-    statusEl.textContent = "Config status niet beschikbaar.";
+    statusEl.textContent = t("configUnavailable");
   }
 }
 
@@ -259,14 +354,15 @@ async function bootPopup() {
       configUrl: "",
       urlBlacklist: [],
       playerTypes: {},
+      uiLang: "auto",
     });
-    playerTypes = WsFillConfig.normalizePlayerTypes(result.playerTypes);
-    renderPlayerTypes();
+    langPref = result.uiLang || "auto";
+    locale = WsFillI18n.resolveLocale(langPref);
     enabledEl.checked = result.enabled !== false;
     urlEl.value = result.configUrl || "";
+    playerTypes = WsFillConfig.normalizePlayerTypes(result.playerTypes);
     const normalized = WsFillConfig.normalizeBlacklist(result.urlBlacklist || []);
     urlBlacklist = normalized;
-    renderBlacklist();
     const before = JSON.stringify(result.urlBlacklist || []);
     const after = JSON.stringify(normalized);
     if (before !== after) {
@@ -275,12 +371,19 @@ async function bootPopup() {
   } catch {
     /* ignore */
   }
-  await renderStatus();
+
+  applyLanguage();
   await loadCurrentType();
 }
 
 enabledEl.addEventListener("change", () => {
   storageSet({ enabled: enabledEl.checked });
+});
+
+langEl.addEventListener("change", () => {
+  langPref = langEl.value || "auto";
+  storageSet({ uiLang: langPref });
+  applyLanguage();
 });
 
 urlEl.addEventListener("change", () => {
@@ -314,16 +417,21 @@ chooseCancel.addEventListener("click", hideChoice);
 refreshBtn.addEventListener("click", async () => {
   await storageSet({ configUrl: urlEl.value.trim() });
   refreshBtn.disabled = true;
-  statusEl.textContent = "Controleren…";
+  statusEl.textContent = t("checking");
   try {
     const result = await chrome.runtime.sendMessage({ type: "refreshConfig" });
     if (result?.ok) {
-      statusEl.textContent = `OK · bron: ${result.source} · v${result.version}`;
+      statusEl.textContent = t("checkOk", {
+        s: result.source,
+        v: result.version,
+      });
     } else {
-      statusEl.textContent = `Mislukt: ${result?.error || "onbekend"} (fallback actief)`;
+      statusEl.textContent = t("checkFailed", {
+        err: result?.error || t("unknownError"),
+      });
     }
   } catch (err) {
-    statusEl.textContent = err?.message || "Service worker niet bereikbaar";
+    statusEl.textContent = err?.message || t("swUnreachable");
   }
   refreshBtn.disabled = false;
   await renderStatus();
@@ -331,13 +439,16 @@ refreshBtn.addEventListener("click", async () => {
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local") renderStatus();
-  if (area === "sync" && changes.playerTypes) {
-    playerTypes = WsFillConfig.normalizePlayerTypes(
-      changes.playerTypes.newValue
-    );
+  if (area !== "sync") return;
+  if (changes.uiLang) {
+    langPref = changes.uiLang.newValue || "auto";
+    applyLanguage();
+  }
+  if (changes.playerTypes) {
+    playerTypes = WsFillConfig.normalizePlayerTypes(changes.playerTypes.newValue);
     renderPlayerTypes();
   }
-  if (area === "sync" && changes.urlBlacklist) {
+  if (changes.urlBlacklist) {
     urlBlacklist = WsFillConfig.normalizeBlacklist(
       changes.urlBlacklist.newValue || []
     );

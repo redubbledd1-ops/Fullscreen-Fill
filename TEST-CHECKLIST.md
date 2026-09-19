@@ -98,6 +98,10 @@ Alternatief DRM als Netflix niet kan: Disney+/Prime/other — noteer welke.
 | 24 | Spelertype **MSE** uit -> YouTube fullscreen | Geen stretch; native/embed-sites wel | | |
 | 25 | Spelertype **embed** uit | Geen frame-stretch en geen parent-iframe verbreding | | |
 | 26 | Spelertype weer aan | Stretch komt terug zonder tab-reload | | |
+| 27 | Popup met browsertaal NL / EN / DE | Teksten in die taal; "Automatisch" toont de gedetecteerde taal | | |
+| 28 | Taal handmatig wisselen in de dropdown | Alles hertaalt direct, ook lijsten, badges en statusregel | | |
+| 29 | Taal na popup opnieuw openen | Keuze onthouden (sync) | | |
+| 30 | Browsertaal zonder vertaling (bijv. pl) | Valt terug op Engels, geen lege knoppen | | |
 
 ---
 
