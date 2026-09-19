@@ -12,9 +12,14 @@ const currentChoiceText = document.getElementById("currentChoiceText");
 const chooseUrl = document.getElementById("chooseUrl");
 const chooseDomain = document.getElementById("chooseDomain");
 const chooseCancel = document.getElementById("chooseCancel");
+const typeList = document.getElementById("typeList");
+const typesSummary = document.getElementById("typesSummary");
+const currentTypeEl = document.getElementById("currentType");
 
 let urlBlacklist = [];
 let pendingTab = null;
+let playerTypes = WsFillConfig.defaultPlayerTypes();
+let currentType = "";
 
 function formatTime(ts) {
   if (!ts) return "—";
@@ -73,6 +78,75 @@ function renderBlacklist() {
     li.append(label, removeBtn);
     blacklistList.appendChild(li);
   });
+}
+
+function renderPlayerTypes() {
+  typeList.replaceChildren();
+  const off = WsFillConfig.PLAYER_TYPES.filter((t) => playerTypes[t] === false);
+  typesSummary.textContent = off.length
+    ? `Spelertypes (${off.length} uit)`
+    : "Spelertypes";
+
+  for (const type of WsFillConfig.PLAYER_TYPES) {
+    const label = document.createElement("label");
+    if (type === currentType) label.classList.add("current");
+
+    const box = document.createElement("input");
+    box.type = "checkbox";
+    box.checked = playerTypes[type] !== false;
+    box.addEventListener("change", () => {
+      playerTypes = WsFillConfig.normalizePlayerTypes({
+        ...playerTypes,
+        [type]: box.checked,
+      });
+      storageSet({ playerTypes });
+      renderPlayerTypes();
+    });
+
+    const text = document.createElement("span");
+    text.textContent = WsFillConfig.playerTypeLabel(type);
+    label.append(box, text);
+
+    if (type === currentType) {
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = "deze tab";
+      label.appendChild(badge);
+    }
+
+    typeList.appendChild(label);
+  }
+}
+
+function describeState(state) {
+  if (!state?.type) return "Huidige tab: geen speler gevonden";
+  const label = state.typeLabel || state.type;
+  let why = "breedbeeld actief";
+  if (!state.enabled) why = "extensie uit";
+  else if (state.blacklisted) why = "geblacklist";
+  else if (!state.typeAllowed) why = "dit spelertype staat uit";
+  else if (!state.active && state.fullscreenOnly && !state.fullscreen) {
+    why = "alleen in fullscreen";
+  } else if (!state.active) why = "nu niet actief";
+  return `Huidige tab: ${label} · ${why}`;
+}
+
+async function loadCurrentType() {
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tab = tabs[0];
+    if (!tab?.id) throw new Error("geen tab");
+    const state = await chrome.tabs.sendMessage(tab.id, {
+      type: "wsFillState",
+    });
+    currentType = state?.type || "";
+    currentTypeEl.textContent = describeState(state);
+  } catch {
+    currentType = "";
+    currentTypeEl.textContent =
+      "Huidige tab: onbekend (pagina herladen na update)";
+  }
+  renderPlayerTypes();
 }
 
 function addBlacklistEntry() {
@@ -184,7 +258,10 @@ async function bootPopup() {
       enabled: true,
       configUrl: "",
       urlBlacklist: [],
+      playerTypes: {},
     });
+    playerTypes = WsFillConfig.normalizePlayerTypes(result.playerTypes);
+    renderPlayerTypes();
     enabledEl.checked = result.enabled !== false;
     urlEl.value = result.configUrl || "";
     const normalized = WsFillConfig.normalizeBlacklist(result.urlBlacklist || []);
@@ -199,6 +276,7 @@ async function bootPopup() {
     /* ignore */
   }
   await renderStatus();
+  await loadCurrentType();
 }
 
 enabledEl.addEventListener("change", () => {
@@ -253,6 +331,12 @@ refreshBtn.addEventListener("click", async () => {
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local") renderStatus();
+  if (area === "sync" && changes.playerTypes) {
+    playerTypes = WsFillConfig.normalizePlayerTypes(
+      changes.playerTypes.newValue
+    );
+    renderPlayerTypes();
+  }
   if (area === "sync" && changes.urlBlacklist) {
     urlBlacklist = WsFillConfig.normalizeBlacklist(
       changes.urlBlacklist.newValue || []

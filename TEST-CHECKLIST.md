@@ -17,6 +17,7 @@ Checklist na code-/config-wijzigingen. Extensie herladen → per rij: **Pass** /
 | Skip | Geen account / geo / site down |
 
 **Portrait-regel:** verticale video’s mogen **nooit** breed uitrekken (`object-fit: contain` / geen fill).  
+**Eigendom-regel:** inline styles die de site zelf zet (YouTube schrijft `width`/`height`/`left`/`top` op de `<video>`) moeten na opruimen **exact terug** staan - leeg grijs speelvlak = regressie.  
 **Preview-regel:** kleine thumbnails / home-feeds mogen **niet** meegaan.
 
 ---
@@ -93,6 +94,10 @@ Alternatief DRM als Netflix niet kan: Disney+/Prime/other — noteer welke.
 | 20 | Blacklist: één YouTube **video** (`ytid:`) | Alleen die video geblokt; andere YT ok | | |
 | 21 | Remote config “Nu controleren” (of bundled) | Geen errors; config-versie zichtbaar | | |
 | 22 | Extensie-pagina errors | Geen `Unchecked runtime.lastError` | | |
+| 23 | Popup toont spelertype van huidige tab | YouTube = MSE, Netflix = DRM, embed-site = Iframe-embed | | |
+| 24 | Spelertype **MSE** uit -> YouTube fullscreen | Geen stretch; native/embed-sites wel | | |
+| 25 | Spelertype **embed** uit | Geen frame-stretch en geen parent-iframe verbreding | | |
+| 26 | Spelertype weer aan | Stretch komt terug zonder tab-reload | | |
 
 ---
 

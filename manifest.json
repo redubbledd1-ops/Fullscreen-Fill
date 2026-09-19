@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Widescreen Fill",
-  "version": "1.11.3",
+  "version": "1.12.0",
   "description": "Breedbeeld voor landscape-video's. URL-blacklist en remote config via popup.",
   "action": {
     "default_title": "Widescreen Fill",

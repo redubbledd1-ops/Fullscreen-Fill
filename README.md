@@ -49,6 +49,26 @@ Nieuwe hardnekkige site = config-update, geen store-release.
 
 In de popup: één domein of URL per regel. Matches krijgen **nooit** breedbeeld.
 
+## Spelertype-filter
+
+Naast de URL-blacklist kan per **spelertype** worden uitgezet (popup →
+**Spelertypes**). Handig als een type op een bepaald apparaat of in een bepaalde
+browser problemen geeft, of gewoon niet gewenst is.
+
+| Type | Wat | Voorbeeld |
+|------|-----|-----------|
+| `native` | directe bron (mp4 e.d.), ook onbekende bronnen | nieuws-site, lokale HTML5 |
+| `mse` | MediaSource / `blob:`-bron | YouTube, meeste streaming |
+| `drm` | EME/beveiligd (`mediaKeys` of `encrypted`-event) | Netflix, Prime |
+| `embed` | speler in een iframe (in het frame én de parent-verbreding) | embedsports, viduki |
+
+Eén type per video, in deze volgorde: `drm` → `embed` → `mse` → `native`. Een
+uitgevinkt type krijgt nooit breedbeeld, op geen enkele site. De popup toont ook
+welk type de huidige tab draait en waarom breedbeeld wel/niet actief is.
+
+Opslag: `chrome.storage.sync` sleutel `playerTypes` (`{ native, mse, drm, embed }`,
+alles wat niet expliciet `false` is staat aan).
+
 ## Remote config
 
 Popup → **URL check**: optionele remote `config.json`. Elke 6 uur + **Nu controleren**.

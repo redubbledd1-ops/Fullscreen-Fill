@@ -17,6 +17,9 @@
 
   let enabled = true;
   let urlBlacklist = [];
+  let playerTypes = WsFillConfig.defaultPlayerTypes();
+  const drmVideos = new WeakSet();
+  const trackedVideos = new WeakSet();
   let generic = {
     embedStretchHosts: "viduki\\.net|embedsports\\.me",
     mainVideoMinAreaRatio: 0.32,
@@ -246,6 +249,38 @@
     return areaRatio >= minArea || isMainPlayerVideo(video);
   }
 
+  /** Watch for EME so a protected player is recognised as drm, not mse. */
+  function trackVideo(video) {
+    if (!video || trackedVideos.has(video)) return;
+    trackedVideos.add(video);
+    video.addEventListener(
+      "encrypted",
+      () => {
+        drmVideos.add(video);
+        lastAppliedKey = "";
+        scheduleApply();
+      },
+      { once: true }
+    );
+  }
+
+  function videoType(video) {
+    if (!video) return "";
+    trackVideo(video);
+    return WsFillConfig.detectPlayerType(video, {
+      inIframe,
+      drmSeen: drmVideos.has(video),
+    });
+  }
+
+  function typeAllowed(video) {
+    return WsFillConfig.isPlayerTypeEnabled(playerTypes, videoType(video));
+  }
+
+  function embedTypeAllowed() {
+    return WsFillConfig.isPlayerTypeEnabled(playerTypes, "embed");
+  }
+
   function onVideoMetadata() {
     lastAppliedKey = "";
     scheduleApply();
@@ -268,6 +303,9 @@
       return false;
     }
 
+    // Player type switched off in the popup.
+    if (primary && !typeAllowed(primary)) return false;
+
     const fs = isFullscreen() || isHintedFullscreen();
     // YouTube-style sites: only stretch in (hinted) fullscreen.
     if (isFullscreenOnlySite()) return fs;
@@ -275,7 +313,7 @@
     if (fs) return true;
     if (isPseudoFullscreen()) return true;
     if (!inIframe && hasMainPlayerVideo()) return true;
-    if (!inIframe && findPrimaryPlayerIframe()) return true;
+    if (!inIframe && embedTypeAllowed() && findPrimaryPlayerIframe()) return true;
     if (inIframe && document.querySelector("video")) {
       if (isSafeEmbedHost() || isPlayerSizedEmbed()) return true;
     }
@@ -663,12 +701,22 @@
     const hasLocalMain = hasMainPlayerVideo();
 
     // Parent pages that host a large player iframe (no local <video>).
-    if (!inIframe && !hasLocalMain && !isFullscreenOnlySite()) {
+    if (
+      !inIframe &&
+      !hasLocalMain &&
+      !isFullscreenOnlySite() &&
+      embedTypeAllowed()
+    ) {
       adaptPrimaryIframe();
     }
 
     document.querySelectorAll("video").forEach((video) => {
       if (!inIframe && !fsOrPseudo && !isMainPlayerVideo(video)) {
+        restoreFill(video);
+        return;
+      }
+
+      if (!typeAllowed(video)) {
         restoreFill(video);
         return;
       }
@@ -699,7 +747,7 @@
     const pseudo = !fs && isPseudoFullscreen();
     const active = shouldStretchContext();
     const primaryIframe =
-      !inIframe && !isFullscreenOnlySite()
+      !inIframe && !isFullscreenOnlySite() && embedTypeAllowed()
         ? findPrimaryPlayerIframe()
         : null;
     const pageMode =
@@ -719,6 +767,8 @@
     const key = [
       enabled,
       active,
+      videoType(primaryVideo()),
+      JSON.stringify(playerTypes),
       pageMode,
       embedMode,
       fs,
@@ -754,6 +804,36 @@
       clearAllVideoStretch();
     }
   }
+
+  /** Popup asks the top frame what it is looking at. */
+  function currentState() {
+    const video = primaryVideo();
+    const iframe =
+      !inIframe && embedTypeAllowed() ? findPrimaryPlayerIframe() : null;
+    const type = video ? videoType(video) : iframe ? "embed" : "";
+    return {
+      ok: true,
+      type,
+      typeLabel: type ? WsFillConfig.playerTypeLabel(type) : "",
+      typeAllowed: WsFillConfig.isPlayerTypeEnabled(playerTypes, type),
+      enabled,
+      active: document.documentElement.classList.contains(ROOT),
+      blacklisted: isBlacklistedNow(),
+      fullscreenOnly: isFullscreenOnlySite(),
+      fullscreen: isFullscreen() || isHintedFullscreen(),
+    };
+  }
+
+  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+    if (msg?.type !== "wsFillState") return false;
+    if (window !== window.top) return false;
+    try {
+      sendResponse(currentState());
+    } catch {
+      /* popup closed */
+    }
+    return false;
+  });
 
   function scheduleApply() {
     if (applyTimer) return;
@@ -871,9 +951,11 @@
       const pref = await chrome.storage.sync.get({
         [STORAGE_KEY]: true,
         urlBlacklist: [],
+        playerTypes: {},
       });
       enabled = pref[STORAGE_KEY] !== false;
       urlBlacklist = WsFillConfig.normalizeBlacklist(pref.urlBlacklist || []);
+      playerTypes = WsFillConfig.normalizePlayerTypes(pref.playerTypes);
     } catch {
       return;
     }
@@ -883,6 +965,13 @@
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "sync" && changes[STORAGE_KEY]) {
       enabled = changes[STORAGE_KEY].newValue !== false;
+      lastAppliedKey = "";
+      scheduleApply();
+    }
+    if (area === "sync" && changes.playerTypes) {
+      playerTypes = WsFillConfig.normalizePlayerTypes(
+        changes.playerTypes.newValue
+      );
       lastAppliedKey = "";
       scheduleApply();
     }

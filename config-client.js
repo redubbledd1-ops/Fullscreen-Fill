@@ -175,6 +175,71 @@ const WsFillConfig = (() => {
     injectOverrideCss(matchingOverrideCss(config, href));
   }
 
+  /**
+   * Player types the user can switch off separately from the URL blacklist.
+   * One type per video, decided in this order: drm > embed > mse > native.
+   */
+  const PLAYER_TYPES = ["native", "mse", "drm", "embed"];
+
+  const PLAYER_TYPE_LABELS = {
+    native: "Native (mp4 / directe bron)",
+    mse: "MSE (YouTube, meeste streaming)",
+    drm: "DRM (Netflix, Prime, beveiligd)",
+    embed: "Iframe-embed (speler in frame)",
+  };
+
+  function defaultPlayerTypes() {
+    const out = {};
+    for (const type of PLAYER_TYPES) out[type] = true;
+    return out;
+  }
+
+  /** Unknown keys are dropped; anything not explicitly false stays on. */
+  function normalizePlayerTypes(raw) {
+    const out = defaultPlayerTypes();
+    if (!raw || typeof raw !== "object") return out;
+    for (const type of PLAYER_TYPES) {
+      if (raw[type] === false) out[type] = false;
+    }
+    return out;
+  }
+
+  function isPlayerTypeEnabled(types, type) {
+    if (!type) return true;
+    return normalizePlayerTypes(types)[type] !== false;
+  }
+
+  function playerTypeLabel(type) {
+    return PLAYER_TYPE_LABELS[type] || type || "onbekend";
+  }
+
+  function hasMediaKeys(video) {
+    try {
+      return Boolean(video && video.mediaKeys);
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * detectPlayerType(video, { inIframe, drmSeen })
+   * drmSeen = an "encrypted" event was observed on this element.
+   * A source we cannot classify counts as native.
+   */
+  function detectPlayerType(video, options = {}) {
+    if (options.drmSeen || hasMediaKeys(video)) return "drm";
+    if (options.inIframe) return "embed";
+    let src = "";
+    try {
+      src = video?.currentSrc || video?.src || "";
+      if (!src && video?.srcObject) return "mse";
+    } catch {
+      src = "";
+    }
+    if (/^blob:/i.test(src)) return "mse";
+    return "native";
+  }
+
   /** true = portrait (taller than wide). null = dimensions unknown yet. */
   function portraitState(video) {
     if (!video) return null;
@@ -401,5 +466,12 @@ const WsFillConfig = (() => {
     displayBlacklistEntry,
     isYouTubeHost,
     stripWww,
+    PLAYER_TYPES,
+    PLAYER_TYPE_LABELS,
+    defaultPlayerTypes,
+    normalizePlayerTypes,
+    isPlayerTypeEnabled,
+    playerTypeLabel,
+    detectPlayerType,
   };
 })();
