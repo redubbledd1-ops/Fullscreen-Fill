@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Widescreen Fill</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        font: 14px/1.4 system-ui, Segoe UI, sans-serif;
+        padding: 14px 16px 16px;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      h2 {
+        margin: 14px 0 6px;
+        font-size: 12px;
+        font-weight: 600;
+        opacity: 0.9;
+      }
+
+      label.row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      label.block {
+        display: block;
+        margin-top: 8px;
+        font-size: 12px;
+        opacity: 0.85;
+      }
+
+      input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+      }
+
+      input[type="url"],
+      input[type="text"] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 6px 8px;
+        font: inherit;
+      }
+
+      .add-row {
+        display: flex;
+        gap: 6px;
+        margin-top: 4px;
+      }
+
+      .add-row input {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .add-row button {
+        flex-shrink: 0;
+      }
+
+      #blacklistList {
+        list-style: none;
+        margin: 8px 0 0;
+        padding: 0;
+        max-height: 140px;
+        overflow: auto;
+      }
+
+      #blacklistList:empty::after {
+        content: "Nog geen URL’s geblokkeerd.";
+        display: block;
+        font-size: 12px;
+        opacity: 0.55;
+        padding: 4px 0;
+      }
+
+      #blacklistList li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 0;
+        border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+        font-size: 12px;
+        word-break: break-all;
+      }
+
+      #blacklistList li span {
+        flex: 1;
+        min-width: 0;
+      }
+
+      #blacklistList li button {
+        flex-shrink: 0;
+        padding: 2px 8px;
+        font-size: 11px;
+      }
+
+      details {
+        margin-top: 12px;
+        border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+        padding-top: 8px;
+      }
+
+      summary {
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        user-select: none;
+      }
+
+      summary:hover {
+        opacity: 0.85;
+      }
+
+      .meta {
+        margin: 8px 0 0;
+        font-size: 12px;
+        opacity: 0.75;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        font: inherit;
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+
+      .choice {
+        display: none;
+        margin-top: 8px;
+        padding: 8px;
+        border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+        border-radius: 6px;
+        font-size: 12px;
+      }
+
+      .choice.visible {
+        display: block;
+      }
+
+      .choice p {
+        margin: 0 0 8px;
+        word-break: break-all;
+      }
+
+      .hint {
+        margin: 6px 0 0;
+        font-size: 11px;
+        opacity: 0.65;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Widescreen Fill</h1>
+    <label class="row">
+      <input type="checkbox" id="enabled" />
+      Breedbeeld aan
+    </label>
+
+    <details id="blacklistPanel">
+      <summary id="blacklistSummary">URL blacklist</summary>
+      <div class="add-row">
+        <input
+          type="text"
+          id="blacklistInput"
+          placeholder="domein of URL, bijv. example.com"
+          spellcheck="false"
+          autocomplete="off"
+        />
+        <button type="button" id="blacklistAdd">Add</button>
+      </div>
+      <div class="actions">
+        <button type="button" id="blacklistCurrent">Huidige pagina blokkeren</button>
+      </div>
+      <div class="choice" id="currentChoice" hidden>
+        <p id="currentChoiceText"></p>
+        <div class="actions">
+          <button type="button" id="chooseUrl">Alleen deze URL</button>
+          <button type="button" id="chooseDomain">Heel domain</button>
+          <button type="button" id="chooseCancel">Annuleren</button>
+        </div>
+      </div>
+      <ul id="blacklistList"></ul>
+      <p class="hint">
+        Typ + Add, of blokkeer de huidige tab en kies URL of domain.
+      </p>
+    </details>
+
+    <details id="urlCheck">
+      <summary>URL check</summary>
+      <label class="block" for="configUrl">Remote config URL (optioneel)</label>
+      <input
+        type="url"
+        id="configUrl"
+        placeholder="https://…/config.json"
+        spellcheck="false"
+      />
+      <p class="meta" id="status">Config laden…</p>
+      <div class="actions">
+        <button type="button" id="refresh">Nu controleren</button>
+      </div>
+      <p class="hint">
+        Optioneel: remote selectors bijwerken. Zonder URL blijft de ingebouwde
+        config actief.
+      </p>
+    </details>
+
+    <script src="config-client.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

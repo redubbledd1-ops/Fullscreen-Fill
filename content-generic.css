@@ -1,0 +1,30 @@
+/* Generic stretch — keep player chrome intact so native fullscreen keeps working. */
+
+/* Landscape video fill only (no absolute reposition of player shells). */
+html.ws-fill-active:not(.ws-fill-portrait) video {
+  object-fit: fill !important;
+  object-position: center center !important;
+}
+
+html.ws-fill-active.ws-fill-portrait video {
+  object-fit: contain !important;
+}
+
+/* Large on-page / fullscreen / pseudo-FS / embed: fill the video box */
+html.ws-fill-active.ws-fill-page:not(.ws-fill-portrait) video,
+html.ws-fill-active.ws-fill-fs:not(.ws-fill-portrait) video,
+html.ws-fill-active.ws-fill-pseudo:not(.ws-fill-portrait) video,
+html.ws-fill-active.ws-fill-embed:not(.ws-fill-portrait) video {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+/* Primary stream iframe on parent pages (structural adapter) */
+html.ws-fill-active.ws-fill-page iframe[data-ws-fill="iframe"] {
+  width: 100% !important;
+  max-width: none !important;
+  display: block !important;
+  aspect-ratio: auto !important;
+}

@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Widescreen Fill",
+  "version": "1.11.1",
+  "description": "Breedbeeld voor landscape-video's. URL-blacklist en remote config via popup.",
+  "action": {
+    "default_title": "Widescreen Fill",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["storage", "alarms", "activeTab"],
+  "host_permissions": ["*://*/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "exclude_matches": [
+        "*://photos.google.com/*",
+        "*://*.photos.google.com/*"
+      ],
+      "js": ["config-client.js", "content-generic.js"],
+      "css": ["content-generic.css"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}
