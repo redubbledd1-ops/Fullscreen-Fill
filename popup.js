@@ -14,6 +14,7 @@ const chooseUrl = document.getElementById("chooseUrl");
 const chooseDomain = document.getElementById("chooseDomain");
 const chooseCancel = document.getElementById("chooseCancel");
 const typeList = document.getElementById("typeList");
+const reloadTabBtn = document.getElementById("reloadTab");
 const typesSummary = document.getElementById("typesSummary");
 const currentTypeEl = document.getElementById("currentType");
 
@@ -375,6 +376,26 @@ async function bootPopup() {
   applyLanguage();
   await loadCurrentType();
 }
+
+/** Some pages only pick up a changed setting (or an updated extension) on reload. */
+reloadTabBtn.addEventListener("click", async () => {
+  reloadTabBtn.disabled = true;
+  currentTypeEl.textContent = t("reloading");
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tab = tabs[0];
+    if (tab?.id) {
+      await chrome.tabs.reload(tab.id);
+      // Give the content script time to boot before asking it anything.
+      await new Promise((resolve) => setTimeout(resolve, 800));
+    }
+  } catch {
+    /* tab gone or not reloadable */
+  }
+  lastState = null;
+  await loadCurrentType();
+  reloadTabBtn.disabled = false;
+});
 
 enabledEl.addEventListener("change", () => {
   storageSet({ enabled: enabledEl.checked });
