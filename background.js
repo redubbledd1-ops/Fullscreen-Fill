@@ -1,13 +1,19 @@
+// Chrome loads this as a service worker; Firefox as an event page with
+// browser-api.js already in its background.scripts list.
+if (typeof importScripts === "function" && !globalThis.WsFillApi) {
+  importScripts("browser-api.js");
+}
+
 const ALARM_NAME = "ws-fill-config-refresh";
 const DEFAULT_INTERVAL_HOURS = 6;
 
 async function getConfigUrl() {
-  const { configUrl } = await chrome.storage.sync.get({ configUrl: "" });
+  const { configUrl } = await WsFillApi.storage.sync.get({ configUrl: "" });
   return (configUrl || "").trim();
 }
 
 async function loadDefaults() {
-  const res = await fetch(chrome.runtime.getURL("config/defaults.json"));
+  const res = await fetch(WsFillApi.runtime.getURL("config/defaults.json"));
   return res.json();
 }
 
@@ -40,7 +46,7 @@ function slimResult(result) {
 async function refreshConfig({ force = false } = {}) {
   const url = await getConfigUrl();
   const now = Date.now();
-  const meta = await chrome.storage.local.get([
+  const meta = await WsFillApi.storage.local.get([
     "remoteConfig",
     "configFetchedAt",
     "configFetchError",
@@ -49,7 +55,7 @@ async function refreshConfig({ force = false } = {}) {
 
   if (!url) {
     const defaults = await loadDefaults();
-    await chrome.storage.local.set({
+    await WsFillApi.storage.local.set({
       remoteConfig: defaults,
       configFetchedAt: now,
       configFetchError: "",
@@ -70,7 +76,7 @@ async function refreshConfig({ force = false } = {}) {
     const json = await res.json();
     if (!isValid(json)) throw new Error("Ongeldige config");
 
-    await chrome.storage.local.set({
+    await WsFillApi.storage.local.set({
       remoteConfig: json,
       configFetchedAt: now,
       configFetchError: "",
@@ -81,7 +87,7 @@ async function refreshConfig({ force = false } = {}) {
     const fallback = isValid(meta.remoteConfig)
       ? meta.remoteConfig
       : await loadDefaults();
-    await chrome.storage.local.set({
+    await WsFillApi.storage.local.set({
       remoteConfig: fallback,
       configFetchedAt: now,
       configFetchError: String(err.message || err),
@@ -97,9 +103,9 @@ function safeRefresh(force) {
   });
 }
 
-chrome.runtime.onInstalled.addListener(() => {
+WsFillApi.runtime.onInstalled.addListener(() => {
   try {
-    chrome.alarms.create(ALARM_NAME, {
+    WsFillApi.alarms.create(ALARM_NAME, {
       periodInMinutes: DEFAULT_INTERVAL_HOURS * 60,
     });
   } catch {
@@ -108,15 +114,15 @@ chrome.runtime.onInstalled.addListener(() => {
   safeRefresh(true);
 });
 
-chrome.runtime.onStartup.addListener(() => {
+WsFillApi.runtime.onStartup.addListener(() => {
   safeRefresh(true);
 });
 
-chrome.alarms.onAlarm.addListener((alarm) => {
+WsFillApi.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === ALARM_NAME) safeRefresh(true);
 });
 
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+WsFillApi.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg?.type !== "refreshConfig") return false;
 
   refreshConfig({ force: true })

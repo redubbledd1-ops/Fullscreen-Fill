@@ -26,7 +26,10 @@
     "*://*/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "scripts": [
+      "browser-api.js",
+      "background.js"
+    ]
   },
   "content_scripts": [
     {
@@ -49,5 +52,14 @@
       "all_frames": true
     }
   ],
-  "default_locale": "en"
+  "default_locale": "en",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "widescreen-fill@example.com",
+      "strict_min_version": "127.0"
+    },
+    "gecko_android": {
+      "strict_min_version": "127.0"
+    }
+  }
 }

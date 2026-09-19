@@ -1,7 +1,7 @@
 (() => {
-  // Restricted / dead frames: bail before any chrome.* calls.
+  // Restricted / dead frames: bail before any extension API calls.
   try {
-    if (!chrome?.runtime?.id || !chrome?.storage?.sync) return;
+    if (!WsFillApi?.runtime?.id || !WsFillApi?.storage?.sync) return;
   } catch {
     return;
   }
@@ -824,7 +824,7 @@
     };
   }
 
-  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  WsFillApi.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg?.type !== "wsFillState") return false;
     if (window !== window.top) return false;
     try {
@@ -948,7 +948,7 @@
     }
 
     try {
-      const pref = await chrome.storage.sync.get({
+      const pref = await WsFillApi.storage.sync.get({
         [STORAGE_KEY]: true,
         urlBlacklist: [],
         playerTypes: {},
@@ -962,7 +962,7 @@
     apply();
   }
 
-  chrome.storage.onChanged.addListener((changes, area) => {
+  WsFillApi.storage.onChanged.addListener((changes, area) => {
     if (area === "sync" && changes[STORAGE_KEY]) {
       enabled = changes[STORAGE_KEY].newValue !== false;
       lastAppliedKey = "";

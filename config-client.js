@@ -22,7 +22,7 @@ const WsFillConfig = (() => {
   }
 
   async function loadDefaults() {
-    const res = await fetch(chrome.runtime.getURL("config/defaults.json"));
+    const res = await fetch(WsFillApi.runtime.getURL("config/defaults.json"));
     return res.json();
   }
 
@@ -62,7 +62,7 @@ const WsFillConfig = (() => {
   }
 
   async function get() {
-    const stored = await chrome.storage.local.get(["remoteConfig"]);
+    const stored = await WsFillApi.storage.local.get(["remoteConfig"]);
     if (isValid(stored.remoteConfig)) {
       let cfg = stored.remoteConfig;
       if (!Array.isArray(cfg.overrides)) {

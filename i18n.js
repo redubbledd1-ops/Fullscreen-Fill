@@ -359,7 +359,7 @@ const WsFillI18n = (() => {
   function browserLocale() {
     let tag = "";
     try {
-      tag = chrome.i18n?.getUILanguage?.() || "";
+      tag = WsFillApi?.i18n?.getUILanguage?.() || "";
     } catch {
       tag = "";
     }

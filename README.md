@@ -92,10 +92,39 @@ tijdens runtime worden gewisseld.
 
 Popup → **URL check**: optionele remote `config.json`. Elke 6 uur + **Nu controleren**.
 
+## Browsers en build
+
+Eén codebase, twee manifesten. `manifest.json` is Chrome/Edge (MV3 service worker),
+`manifest.firefox.json` is Gecko (MV3 event page + `browser_specific_settings`).
+
+```bash
+node tools/build.js            # dist/chrome en dist/firefox
+node tools/build.js firefox    # alleen dat doel
+```
+
+De build controleert dat beide manifesten dezelfde versie hebben en dat elk bestand
+waar het manifest naar wijst ook echt in de map staat.
+
+Alle extensie-API's lopen via `WsFillApi` uit [browser-api.js](browser-api.js):
+Firefox' `browser.*` geeft promises, `chrome.*` daar geeft callbacks. Nieuwe code
+gebruikt `WsFillApi`, nooit `chrome` of `browser` direct.
+
+Firefox-ID staat nu op `widescreen-fill@example.com` — vervangen door een eigen
+domein vóór de AMO-inzending. Zonder ID werkt `storage.sync` niet in Firefox.
+
+Status van de port: [PORTING-TODO.md](PORTING-TODO.md).
+
 ## Installeren
 
+Chrome/Edge:
+
 1. `chrome://extensions` → Developer mode  
-2. Load unpacked / **Vernieuwen** na updates
+2. Load unpacked op `dist/chrome` (of de projectmap zelf) / **Vernieuwen** na updates
+
+Firefox:
+
+1. `node tools/build.js firefox`  
+2. `about:debugging#/runtime/this-firefox` → **Tijdelijke add-on laden** → `dist/firefox/manifest.json`
 
 ## Regressie
 

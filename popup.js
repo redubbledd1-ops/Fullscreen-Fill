@@ -41,7 +41,7 @@ function formatTime(ts) {
 
 async function storageSet(values) {
   try {
-    await chrome.storage.sync.set(values);
+    await WsFillApi.storage.sync.set(values);
   } catch {
     /* ignore quota / context errors */
   }
@@ -263,7 +263,7 @@ async function startCurrentPageBlock() {
   chooseUrl.disabled = false;
   chooseDomain.disabled = false;
   try {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tabs = await WsFillApi.tabs.query({ active: true, currentWindow: true });
     const tab = tabs[0];
     if (!tab?.url) {
       showChoiceMessage(t("noTabUrl"), false);
@@ -310,10 +310,10 @@ function renderCurrentType() {
 
 async function loadCurrentType() {
   try {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tabs = await WsFillApi.tabs.query({ active: true, currentWindow: true });
     const tab = tabs[0];
     if (!tab?.id) throw new Error("no tab");
-    const state = await chrome.tabs.sendMessage(tab.id, {
+    const state = await WsFillApi.tabs.sendMessage(tab.id, {
       type: "wsFillState",
     });
     lastState = state || false;
@@ -328,7 +328,7 @@ async function loadCurrentType() {
 
 async function renderStatus() {
   try {
-    const data = await chrome.storage.local.get([
+    const data = await WsFillApi.storage.local.get([
       "remoteConfig",
       "configFetchedAt",
       "configFetchError",
@@ -350,7 +350,7 @@ async function renderStatus() {
 
 async function bootPopup() {
   try {
-    const result = await chrome.storage.sync.get({
+    const result = await WsFillApi.storage.sync.get({
       enabled: true,
       configUrl: "",
       urlBlacklist: [],
@@ -382,10 +382,10 @@ reloadTabBtn.addEventListener("click", async () => {
   reloadTabBtn.disabled = true;
   currentTypeEl.textContent = t("reloading");
   try {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tabs = await WsFillApi.tabs.query({ active: true, currentWindow: true });
     const tab = tabs[0];
     if (tab?.id) {
-      await chrome.tabs.reload(tab.id);
+      await WsFillApi.tabs.reload(tab.id);
       // Give the content script time to boot before asking it anything.
       await new Promise((resolve) => setTimeout(resolve, 800));
     }
@@ -440,7 +440,7 @@ refreshBtn.addEventListener("click", async () => {
   refreshBtn.disabled = true;
   statusEl.textContent = t("checking");
   try {
-    const result = await chrome.runtime.sendMessage({ type: "refreshConfig" });
+    const result = await WsFillApi.runtime.sendMessage({ type: "refreshConfig" });
     if (result?.ok) {
       statusEl.textContent = t("checkOk", {
         s: result.source,
@@ -458,7 +458,7 @@ refreshBtn.addEventListener("click", async () => {
   await renderStatus();
 });
 
-chrome.storage.onChanged.addListener((changes, area) => {
+WsFillApi.storage.onChanged.addListener((changes, area) => {
   if (area === "local") renderStatus();
   if (area !== "sync") return;
   if (changes.uiLang) {

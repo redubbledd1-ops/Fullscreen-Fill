@@ -20,3 +20,6 @@ desktop.ini
 !.env.example
 *.pem
 *.key
+
+# buildmappen per browser (node tools/build.js)
+dist/
