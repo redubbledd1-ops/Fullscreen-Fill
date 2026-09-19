@@ -147,9 +147,20 @@
     return areaRatio >= minArea || (w / vw >= minW && h / vh >= minH);
   }
 
+  function isRenderedBox(el) {
+    try {
+      const style = getComputedStyle(el);
+      if (style.visibility === "hidden" || style.display === "none") return false;
+      if (parseFloat(style.opacity) === 0) return false;
+    } catch {
+      return false;
+    }
+    return true;
+  }
+
   function visibleVideos() {
     return [...document.querySelectorAll("video")].filter(
-      (v) => v.clientWidth >= 120 && v.clientHeight >= 80
+      (v) => v.clientWidth >= 120 && v.clientHeight >= 80 && isRenderedBox(v)
     );
   }
 
@@ -235,12 +246,27 @@
     return areaRatio >= minArea || isMainPlayerVideo(video);
   }
 
+  function onVideoMetadata() {
+    lastAppliedKey = "";
+    scheduleApply();
+  }
+
   function isBlacklistedNow() {
     return WsFillConfig.isUrlBlacklisted(urlBlacklist, location.href);
   }
 
   function shouldStretchContext() {
     if (!enabled || isBlacklistedNow()) return false;
+
+    // Orientation unknown yet (no loadedmetadata): staying off avoids stretching
+    // a portrait clip and avoids filling a box the player has not sized yet.
+    const primary = primaryVideo();
+    if (primary && WsFillConfig.portraitState(primary) === null) {
+      primary.addEventListener("loadedmetadata", onVideoMetadata, {
+        once: true,
+      });
+      return false;
+    }
 
     const fs = isFullscreen() || isHintedFullscreen();
     // YouTube-style sites: only stretch in (hinted) fullscreen.
@@ -333,15 +359,14 @@
       hints.transformScale = true;
     }
 
-    if (
-      style.maxWidth !== "none" ||
-      style.maxHeight !== "none" ||
-      (parseFloat(style.maxWidth) > 0 && el.clientWidth >= parseFloat(style.maxWidth) - 1)
-    ) {
-      const maxW = style.maxWidth;
-      const maxH = style.maxHeight;
-      if (maxW !== "none" || maxH !== "none") hints.maxBox = true;
-    }
+    // Only treat a max-width/max-height as a letterbox clamp when it is an
+    // absolute length the element actually hits. "max-width: 100%" or a cap the
+    // box never reaches is normal layout, not letterboxing.
+    const maxW = /px$/.test(style.maxWidth) ? parseFloat(style.maxWidth) : NaN;
+    const maxH = /px$/.test(style.maxHeight) ? parseFloat(style.maxHeight) : NaN;
+    const clampsW = Number.isFinite(maxW) && maxW > 0 && el.clientWidth >= maxW - 1;
+    const clampsH = Number.isFinite(maxH) && maxH > 0 && el.clientHeight >= maxH - 1;
+    if (clampsW || clampsH) hints.maxBox = true;
 
     hints.any =
       hints.aspectRatio ||
@@ -356,8 +381,13 @@
       "max-width": "none",
       "max-height": "none",
       width: "100%",
-      height: "100%",
     };
+
+    // height:100% is only safe on nodes that letterbox structurally; on a plain
+    // max-width wrapper it collapses to 0 (invisible video) or blows up flex/grid.
+    const structural =
+      hints.aspectRatio || hints.paddingHack || hints.transformScale;
+    if (structural) props.height = "100%";
 
     if (hints.aspectRatio) props["aspect-ratio"] = "auto";
     if (hints.paddingHack) {
@@ -370,6 +400,26 @@
     }
 
     markFill(el, props, "wrap");
+  }
+
+  /**
+   * Absolute fill needs the player shell to be the containing block and to have
+   * a usable box. Make it position:relative when it is static.
+   */
+  function canAnchorFill(root) {
+    if (!root || root === document.body || root === document.documentElement) {
+      return false;
+    }
+    const r = root.getBoundingClientRect();
+    if (r.width < 280 || r.height < 160) return false;
+    let pos = "static";
+    try {
+      pos = getComputedStyle(root).position;
+    } catch {
+      return false;
+    }
+    if (pos === "static") markFill(root, { position: "relative" }, "wrap");
+    return true;
   }
 
   /**
@@ -425,6 +475,11 @@
     });
 
     if (!deepFill) return;
+
+    // Pinning with position:absolute only works if the shell is a containing
+    // block with a real box. Otherwise the video escapes to some far ancestor
+    // (or a 0-height box) and disappears / renders in the wrong place.
+    if (!canAnchorFill(root)) return;
 
     const container = video.parentElement;
     if (container && root.contains(container) && container !== root) {
@@ -744,6 +799,15 @@
     scheduleApply();
   });
 
+  function marksLost() {
+    if (!document.documentElement.classList.contains(ROOT)) return false;
+    if (document.querySelector(`video[${MARK}]`)) return false;
+    if (primaryPortrait() === true) return false;
+    return inIframe
+      ? Boolean(document.querySelector("video"))
+      : hasMainPlayerVideo();
+  }
+
   let lastUrl = location.href;
   setInterval(() => {
     if (!enabled) return;
@@ -751,6 +815,12 @@
       lastUrl = location.href;
       lastAppliedKey = "";
       watchHintedPlayers();
+      scheduleApply();
+      return;
+    }
+    // The page re-rendered the player and dropped our inline styles.
+    if (marksLost()) {
+      lastAppliedKey = "";
       scheduleApply();
     }
   }, 1000);

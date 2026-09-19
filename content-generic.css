@@ -1,20 +1,26 @@
 /* Generic stretch — keep player chrome intact so native fullscreen keeps working. */
 
+/*
+ * Scope: only videos the engine actually selected (marked with data-ws-fill)
+ * are ever touched. Unmarked videos (thumbnails, previews, background loops,
+ * portrait clips still loading metadata) must stay exactly as the site had them.
+ */
+
 /* Landscape video fill only (no absolute reposition of player shells). */
-html.ws-fill-active:not(.ws-fill-portrait) video {
+html.ws-fill-active:not(.ws-fill-portrait) video[data-ws-fill] {
   object-fit: fill !important;
   object-position: center center !important;
 }
 
-html.ws-fill-active.ws-fill-portrait video {
+html.ws-fill-active.ws-fill-portrait video[data-ws-fill] {
   object-fit: contain !important;
 }
 
 /* Large on-page / fullscreen / pseudo-FS / embed: fill the video box */
-html.ws-fill-active.ws-fill-page:not(.ws-fill-portrait) video,
-html.ws-fill-active.ws-fill-fs:not(.ws-fill-portrait) video,
-html.ws-fill-active.ws-fill-pseudo:not(.ws-fill-portrait) video,
-html.ws-fill-active.ws-fill-embed:not(.ws-fill-portrait) video {
+html.ws-fill-active.ws-fill-page:not(.ws-fill-portrait) video[data-ws-fill],
+html.ws-fill-active.ws-fill-fs:not(.ws-fill-portrait) video[data-ws-fill],
+html.ws-fill-active.ws-fill-pseudo:not(.ws-fill-portrait) video[data-ws-fill],
+html.ws-fill-active.ws-fill-embed:not(.ws-fill-portrait) video[data-ws-fill] {
   width: 100% !important;
   height: 100% !important;
   max-width: none !important;
