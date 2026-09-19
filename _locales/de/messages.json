@@ -4,7 +4,7 @@
     "description": "Extension name shown in the store and browser."
   },
   "extDesc": {
-    "message": "Landscape-Videos auf Breitbild strecken. URL-Sperrliste, Playertyp-Filter und Remote-Config.",
+    "message": "Querformat-Videos auf den ganzen Bildschirm strecken: ohne schwarze Balken, ohne Zuschnitt. Pro Seite einstellbar.",
     "description": "Extension description shown in the store."
   }
 }

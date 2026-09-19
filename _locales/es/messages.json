@@ -4,7 +4,7 @@
     "description": "Extension name shown in the store and browser."
   },
   "extDesc": {
-    "message": "Estira los vídeos en horizontal para llenar la pantalla. Lista negra de URL, filtro por tipo de reproductor y config remota.",
+    "message": "Estira los vídeos horizontales a toda la pantalla: sin barras negras ni recorte. Ajustable sitio por sitio.",
     "description": "Extension description shown in the store."
   }
 }

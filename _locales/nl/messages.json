@@ -4,7 +4,7 @@
     "description": "Extension name shown in the store and browser."
   },
   "extDesc": {
-    "message": "Rek landscape-video's uit tot breedbeeld. URL-blacklist, spelertype-filter en remote config.",
+    "message": "Rek landscape-video uit tot je hele scherm: geen zwarte balken, geen crop. Werkt op de meeste sites, instelbaar per site.",
     "description": "Extension description shown in the store."
   }
 }

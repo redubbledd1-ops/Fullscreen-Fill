@@ -17,7 +17,7 @@ Afvinken per regel; datum + bevinding erachter.
 | 1.6 | Laden via `about:debugging` → tijdelijke add-on, smoke-test | ⬜ | |
 | 1.7 | Checklist A–G draaien in Firefox desktop | ⬜ | verschillen noteren |
 | 1.8 | Host-permissies MV3: controleren of "Toestaan op alle sites" nodig is bij installatie | ⬜ | Firefox ≥127 vraagt dit bij installatie |
-| 1.9 | Fullscreen-detectie in Gecko: `mozFullScreenElement` verouderd, `fullscreenElement` zou moeten volstaan | ⬜ | |
+| 1.9 | Fullscreen-detectie in Gecko: `mozFullScreenElement` verouderd, `fullscreenElement` zou moeten volstaan | ✅ | `fullscreenElement` wordt eerst gelezen; de oude varianten zijn onschadelijke fallbacks |
 
 ## Fase 2 — Firefox Android
 
@@ -35,9 +35,9 @@ Afvinken per regel; datum + bevinding erachter.
 
 | # | Taak | Status | Notitie |
 |---|------|--------|---------|
-| 3.1 | AMO-inzending, Android-compatibiliteit aanvinken | ⬜ | |
-| 3.2 | Store-teksten `_locales/*/messages.json` opwaarderen (nu functioneel, geen marketing) | ⬜ | |
-| 3.3 | Privacyverklaring: extensie stuurt niets weg behalve optionele remote config-URL | ⬜ | beide stores vragen dit |
+| 3.1 | AMO-inzending, Android-compatibiliteit aanvinken | ⬜ | eerst gecko-ID vervangen |
+| 3.2 | Store-teksten `_locales/*/messages.json` opwaarderen (nu functioneel, geen marketing) | ✅ | lange teksten in [STORE-LISTING.md](STORE-LISTING.md) |
+| 3.3 | Privacyverklaring: extensie stuurt niets weg behalve optionele remote config-URL | ✅ | [PRIVACY.md](PRIVACY.md), moet nog op een publieke URL |
 | 3.4 | Screenshots per store (desktop + mobiel) | ⬜ | |
 | 3.5 | Chrome Web Store-inzending | ⬜ | |
 
