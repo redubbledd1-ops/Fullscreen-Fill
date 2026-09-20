@@ -108,14 +108,25 @@ invult.
 
 ## Beeldmateriaal
 
-| Asset | Maat | Waar |
-|-------|------|------|
-| Store-icoon | 128×128 | `store/icon-128.png` (Chrome Web Store, AMO) |
-| Groot icoon | 512×512 | `store/icon-512.png` (AMO-listing, optioneel) |
-| Screenshots | 1280×800 (of 640×400) | nog te maken — zie shot list |
-| Klein promotievak | 440×280 | optioneel, alleen Chrome |
+| Asset | Maat | Verplicht | Waar |
+|-------|------|-----------|------|
+| Store-icoon | 128×128 | ja | `store/icon-128.png` |
+| Screenshots | 1280×800 of 640×400 | ja, 1 t/m 5 | nog te maken — zie shot list |
+| Klein promotievak | 440×280 | ja (Chrome) | nog te maken |
+| Marquee-promotievak | 1400×560 | nee | nog te maken |
+| Groot icoon | 512×512 | nee | `store/icon-512.png` (AMO) |
+| YouTube-video | — | nee | het enige veld dat bewegend beeld toelaat |
 
-Alle iconen komen uit `store/icon-source.png` via `python tools/make-icons.py`.
+Iconen komen uit `store/icon-source.png` via `python tools/make-icons.py`.
+
+Twee regels die makkelijk misgaan:
+
+- **Store-icoon heeft een rand nodig.** Chrome wil 96×96 kunstwerk met 16 px
+  transparante ruimte eromheen, samen 128×128 — de store legt er zelf afronding
+  en schaduw overheen. `store/icon-128.png` is zo opgebouwd. De iconen in
+  `icons/` zijn bewust randloos; die gaan naar de werkbalk, niet naar de store.
+- **Screenshots zijn statisch.** Vierkante hoeken, full bleed, geen animatie.
+  Een uitlegfilmpje hoort in het YouTube-veld, niet in een screenshot.
 
 ## In te dienen bestand
 
@@ -149,4 +160,5 @@ in de root van de zip zoals beide stores vragen.
 - [ ] TEST-CHECKLIST smoke gedraaid op desktop én telefoon
 - [x] Privacyverklaring op een publieke URL (PRIVACY.md in de openbare repo, EN + NL)
 - [ ] Screenshots gemaakt (minimaal 1 van 1280×800 voor Chrome)
-- [ ] Ontwikkelaarsaccount Chrome Web Store betaald (eenmalig $5) op redubbledd1@gmail.com
+- [ ] Klein promotievak 440×280 gemaakt (verplicht bij Chrome)
+- [x] Ontwikkelaarsaccount Chrome Web Store betaald op redubbledd1@gmail.com

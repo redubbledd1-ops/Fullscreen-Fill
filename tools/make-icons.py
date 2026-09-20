@@ -12,6 +12,12 @@ zien er in een donkere werkbalk uit als een vierkant blok, dus we knippen de
 rand weg en maken er een masker bij. Het masker komt uit de afbeelding zelf
 (eerste en laatste niet-zwarte pixel per rij) in plaats van uit een nagetekende
 afgeronde rechthoek, zodat de echte vorm van de tegel behouden blijft.
+
+Het store-icoon van 128 px is níét randloos. De Chrome Web Store vraagt
+96x96 kunstwerk met 16 px transparante rand eromheen; de store zet er zelf een
+schaduw en afronding overheen en die heeft die ruimte nodig. De iconen in
+icons/ blijven wél randloos: daar zou dezelfde rand de werkbalkknop op 16 px
+onnodig klein maken.
 """
 import os
 from PIL import Image
@@ -19,7 +25,11 @@ from PIL import Image
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SOURCE = os.path.join(ROOT, "store", "icon-source.png")
 EXT_SIZES = [16, 32, 48, 128]
-STORE_SIZES = [128, 512]
+# Chrome Web Store: 96 px kunstwerk + 16 px rand = 128 px totaal.
+STORE_ICON = 128
+STORE_ARTWORK = 96
+# AMO kent die regel niet, dus die krijgt de tegel randloos.
+STORE_LARGE = 512
 # Alles onder deze waarde telt als achtergrond. De tegel zelf zit rond 12.
 BLACK = 3
 
@@ -74,10 +84,16 @@ def main():
         base.resize((size, size), Image.LANCZOS).save(out, optimize=True)
         print(os.path.relpath(out, ROOT))
 
-    for size in STORE_SIZES:
-        out = os.path.join(store, f"icon-{size}.png")
-        base.resize((size, size), Image.LANCZOS).save(out, optimize=True)
-        print(os.path.relpath(out, ROOT))
+    padded = Image.new("RGBA", (STORE_ICON, STORE_ICON), (0, 0, 0, 0))
+    inset = (STORE_ICON - STORE_ARTWORK) // 2
+    padded.paste(base.resize((STORE_ARTWORK, STORE_ARTWORK), Image.LANCZOS), (inset, inset))
+    out = os.path.join(store, f"icon-{STORE_ICON}.png")
+    padded.save(out, optimize=True)
+    print(os.path.relpath(out, ROOT))
+
+    out = os.path.join(store, f"icon-{STORE_LARGE}.png")
+    base.resize((STORE_LARGE, STORE_LARGE), Image.LANCZOS).save(out, optimize=True)
+    print(os.path.relpath(out, ROOT))
 
 
 if __name__ == "__main__":
