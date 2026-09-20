@@ -38,8 +38,9 @@ Afvinken per regel; datum + bevinding erachter.
 | 3.1 | AMO-inzending, Android-compatibiliteit aanvinken | ⬜ | eerst gecko-ID vervangen |
 | 3.2 | Store-teksten `_locales/*/messages.json` opwaarderen (nu functioneel, geen marketing) | ✅ | lange teksten in [STORE-LISTING.md](STORE-LISTING.md) |
 | 3.3 | Privacyverklaring: extensie stuurt niets weg behalve optionele remote config-URL | ✅ | [PRIVACY.md](PRIVACY.md), moet nog op een publieke URL |
-| 3.4 | Screenshots per store (desktop + mobiel) | ⬜ | |
-| 3.5 | Chrome Web Store-inzending | ⬜ | |
+| 3.4 | Screenshots per store (desktop + mobiel) | ⬜ | store-iconen staan er al: `store/icon-{128,512}.png` |
+| 3.5 | Chrome Web Store-inzending | 🟡 | zip klaar via `python tools/pack.py`; screenshots + privacy-URL ontbreken |
+| 3.6 | Eigen icoon op alle maten (16/32/48/128) | ✅ | `python tools/make-icons.py` uit `store/icon-source.png` |
 
 ---
 

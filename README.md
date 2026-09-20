@@ -111,10 +111,23 @@ Eén codebase, twee manifesten. `manifest.json` is Chrome/Edge (MV3 service work
 ```bash
 node tools/build.js            # dist/chrome en dist/firefox
 node tools/build.js firefox    # alleen dat doel
+python tools/pack.py           # zips voor de stores, manifest in de root
 ```
 
 De build controleert dat beide manifesten dezelfde versie hebben en dat elk bestand
 waar het manifest naar wijst ook echt in de map staat.
+
+## Iconen
+
+`store/icon-source.png` is het origineel. Alle maten komen daaruit:
+
+```bash
+python tools/make-icons.py     # icons/icon{16,32,48,128}.png + store/icon-{128,512}.png
+```
+
+De bron staat op zwart zonder alfakanaal; het script knipt de rand weg en zet er
+een masker op, zodat de hoeken in een donkere werkbalk niet als blok opvallen.
+Alleen `icons/` gaat mee in de build — `store/` blijft buiten de zip.
 
 Alle extensie-API's lopen via `WsFillApi` uit [browser-api.js](browser-api.js):
 Firefox' `browser.*` geeft promises, `chrome.*` daar geeft callbacks. Nieuwe code

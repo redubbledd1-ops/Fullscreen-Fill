@@ -104,6 +104,26 @@ invult.
 
 ---
 
+## Beeldmateriaal
+
+| Asset | Maat | Waar |
+|-------|------|------|
+| Store-icoon | 128×128 | `store/icon-128.png` (Chrome Web Store, AMO) |
+| Groot icoon | 512×512 | `store/icon-512.png` (AMO-listing, optioneel) |
+| Screenshots | 1280×800 (of 640×400) | nog te maken — zie shot list |
+| Klein promotievak | 440×280 | optioneel, alleen Chrome |
+
+Alle iconen komen uit `store/icon-source.png` via `python tools/make-icons.py`.
+
+## In te dienen bestand
+
+```bash
+node tools/build.js && python tools/pack.py
+```
+
+Levert `dist/chrome-<versie>.zip` en `dist/firefox-<versie>.zip`, met het manifest
+in de root van de zip zoals beide stores vragen.
+
 ## Screenshots (shot list)
 
 | # | Scherm | Waarom |
@@ -118,9 +138,13 @@ invult.
 
 ## Vóór inzending afvinken
 
-- [ ] gecko-ID vervangen
-- [ ] versienummer gelijk in `manifest.json` en `manifest.firefox.json`
-- [ ] `node tools/build.js` gedraaid, beide mappen getest
+- [ ] gecko-ID vervangen (alleen AMO)
+- [x] versienummer gelijk in `manifest.json` en `manifest.firefox.json` (1.18.0)
+- [x] `node tools/build.js` gedraaid
+- [x] Store-iconen gegenereerd (`store/icon-128.png`, `store/icon-512.png`)
+- [x] Upload-zips gemaakt (`python tools/pack.py`)
+- [ ] Beide mappen geladen en getest na de icoonwissel
 - [ ] TEST-CHECKLIST smoke gedraaid op desktop én telefoon
 - [ ] Privacyverklaring op een publieke URL
-- [ ] Screenshots gemaakt
+- [ ] Screenshots gemaakt (minimaal 1 van 1280×800 voor Chrome)
+- [ ] Ontwikkelaarsaccount Chrome Web Store betaald (eenmalig $5) op redubbledd1@gmail.com
