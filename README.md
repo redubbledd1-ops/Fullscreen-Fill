@@ -1,4 +1,4 @@
-# Widescreen Fill
+# Fullscreen Fill
 
 Chrome/Edge-extensie die **landscape**-video's breed uitrekt (volledig beeld zichtbaar, geen zoom/crop). Verticale video's blijven normaal.
 
@@ -133,8 +133,8 @@ Alle extensie-API's lopen via `WsFillApi` uit [browser-api.js](browser-api.js):
 Firefox' `browser.*` geeft promises, `chrome.*` daar geeft callbacks. Nieuwe code
 gebruikt `WsFillApi`, nooit `chrome` of `browser` direct.
 
-Firefox-ID staat nu op `widescreen-fill@example.com` — vervangen door een eigen
-domein vóór de AMO-inzending. Zonder ID werkt `storage.sync` niet in Firefox.
+Firefox-ID is `fullscreen-fill@redubbledd1-ops.github.io`. Zonder ID werkt
+`storage.sync` niet in Firefox, en na de eerste AMO-inzending ligt hij vast.
 
 Status van de port: [PORTING-TODO.md](PORTING-TODO.md).
 

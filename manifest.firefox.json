@@ -57,7 +57,7 @@
   "default_locale": "en",
   "browser_specific_settings": {
     "gecko": {
-      "id": "widescreen-fill@example.com",
+      "id": "fullscreen-fill@redubbledd1-ops.github.io",
       "strict_min_version": "127.0"
     },
     "gecko_android": {

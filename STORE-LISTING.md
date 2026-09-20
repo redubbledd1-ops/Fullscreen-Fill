@@ -8,7 +8,7 @@ moeten gelijk blijven.
 
 ## Naam
 
-`Widescreen Fill`
+`Fullscreen Fill`
 
 ## Korte omschrijving (max 132 tekens, Chrome)
 
@@ -19,7 +19,7 @@ moeten gelijk blijven.
 ## Lange omschrijving (EN)
 
 ```
-Widescreen Fill stretches landscape video so it fills your screen instead of
+Fullscreen Fill stretches landscape video so it fills your screen instead of
 leaving black bars on a 21:9 or ultrawide display. It stretches - it does not
 zoom and crop - so nothing is cut off the top, bottom or sides.
 
@@ -41,7 +41,7 @@ extension can make is fetching a configuration URL that you enter yourself.
 ## Lange omschrijving (NL)
 
 ```
-Widescreen Fill rekt landscape-video uit tot je scherm gevuld is, in plaats van
+Fullscreen Fill rekt landscape-video uit tot je scherm gevuld is, in plaats van
 zwarte balken op een 21:9- of ultrawide-monitor. Het rekt uit - het zoomt niet in
 en snijdt niet bij - dus er valt niets weg aan de boven-, onder- of zijkant.
 
@@ -86,14 +86,16 @@ invult.
   geen surfgeschiedenis, geen website-inhoud.
 - Verkoopt niets aan derden, gebruikt niets voor advertenties, gebruikt niets
   voor kredietwaardigheid.
-- Privacyverklaring-URL: link naar `PRIVACY.md` in de repo (of een eigen pagina).
+- Privacyverklaring-URL:
+  `https://github.com/redubbledd1-ops/Fullscreen-Fill/blob/main/PRIVACY.md`
+  (de repo is openbaar; de verklaring staat er in het Engels en het Nederlands).
 
 ---
 
 ## AMO — aandachtspunten
 
-- `browser_specific_settings.gecko.id` moet vóór inzending een echt eigen adres
-  zijn (nu `widescreen-fill@example.com`).
+- `browser_specific_settings.gecko.id` is `fullscreen-fill@redubbledd1-ops.github.io`.
+  Na de eerste inzending ligt die vast: wijzigen maakt er een nieuwe add-on van.
 - Bij "compatibiliteit" **Android** aanvinken; `gecko_android.strict_min_version`
   staat al in het manifest.
 - Broncode-toelichting is niet nodig: er zit geen build-stap of minificatie in de
@@ -145,6 +147,6 @@ in de root van de zip zoals beide stores vragen.
 - [x] Upload-zips gemaakt (`python tools/pack.py`)
 - [ ] Beide mappen geladen en getest na de icoonwissel
 - [ ] TEST-CHECKLIST smoke gedraaid op desktop én telefoon
-- [ ] Privacyverklaring op een publieke URL
+- [x] Privacyverklaring op een publieke URL (PRIVACY.md in de openbare repo, EN + NL)
 - [ ] Screenshots gemaakt (minimaal 1 van 1280×800 voor Chrome)
 - [ ] Ontwikkelaarsaccount Chrome Web Store betaald (eenmalig $5) op redubbledd1@gmail.com

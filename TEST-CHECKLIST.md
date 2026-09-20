@@ -1,4 +1,4 @@
-# Regressie-meetset — Widescreen Fill
+# Regressie-meetset — Fullscreen Fill
 
 Checklist na code-/config-wijzigingen. Extensie herladen → per rij: **Pass** / **Fail** / **Skip** + korte notitie.
 
