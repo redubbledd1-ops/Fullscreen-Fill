@@ -4,8 +4,17 @@ Chrome/Edge extension that stretches **landscape** video to fill the screen (ful
 
 ## Download
 
-- **Chrome / Edge** — [Chrome Web Store](https://chromewebstore.google.com/detail/hlohbdllkhaihdodmghnhamllchllamj) *(live once the listing is approved)*
-- **Firefox** — coming soon on addons.mozilla.org
+**Chrome / Edge** (until the Chrome Web Store listing is approved):
+
+1. Download the ZIP: [Fullscreen Fill (main branch)](https://github.com/redubbledd1-ops/Fullscreen-Fill/archive/refs/heads/main.zip)
+2. Extract it somewhere permanent — don't delete the folder afterwards, Chrome loads the extension straight from it
+3. Open `chrome://extensions` (or `edge://extensions`) and turn on **Developer mode** (top right)
+4. Click **Load unpacked** and select the extracted `Fullscreen-Fill-main` folder
+5. Done — the icon appears in the toolbar
+
+Once the Chrome Web Store listing goes live, this section will just be a store link instead.
+
+**Firefox** — coming soon on addons.mozilla.org
 
 ## Approach
 
