@@ -20,13 +20,14 @@ Once the Chrome Web Store listing goes live, this section will just be a store l
 
 One generic engine + remote overrides. No site-specific content scripts.
 
-1. **Large on-page players** (≈ ≥32% of the screen)
-2. **Browser fullscreen** — Fullscreen API
-3. **Pseudo-fullscreen** — player ≈ ≥92% of the viewport
-4. **Hinted fullscreen** — config (`fullscreenHint`), e.g. YouTube's `ytp-fullscreen`
-5. **Player-root fill** + structural letterbox adapters
-6. **Embedded iframes** — player size + optional host allowlist
-7. **Remote overrides** — CSS + hints as data
+1. **Large on-page players** (≈ ≥32% of the screen) — the picture is stretched
+   to the box the player chose; the element's own size is never changed
+2. **Browser fullscreen** — the `:fullscreen` CSS pseudo-class, no scripting
+3. **Hinted fullscreen** — config (`fullscreenHint`), e.g. YouTube's `ytp-fullscreen`
+4. **Embedded iframes** — the content script runs in the frame, so a player
+   inside one is handled exactly like a top-level player
+5. **Remote overrides** — CSS + hints as data, for players that letterbox by
+   sizing the `<video>` element itself (YouTube, Netflix)
 
 ## Remote overrides
 

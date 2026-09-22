@@ -17,7 +17,7 @@ Checklist na code-/config-wijzigingen. Extensie herladen → per rij: **Pass** /
 | Skip | Geen account / geo / site down |
 
 **Portrait-regel:** verticale video’s mogen **nooit** breed uitrekken (`object-fit: contain` / geen fill).  
-**Eigendom-regel:** inline styles die de site zelf zet (YouTube schrijft `width`/`height`/`left`/`top` op de `<video>`) moeten na opruimen **exact terug** staan - leeg grijs speelvlak = regressie.  
+**Eigendom-regel:** de extensie schrijft geen inline styles meer. Het speelveld moet buiten fullscreen **exact even groot** blijven als met de extensie uit - verspringende breedte of een leeg grijs speelvlak = regressie.  
 **Preview-regel:** kleine thumbnails / home-feeds mogen **niet** meegaan.
 
 ---
@@ -60,7 +60,7 @@ Alternatief DRM als Netflix niet kan: Disney+/Prime/other — noteer welke.
 
 | # | Site / scenario | Type | Verwacht | Score | Notitie |
 |---|-----------------|------|----------|-------|---------|
-| 10 | Stream-host pagina met **grote** embed (≥ ~480×270) | Iframe embed | Stretch in frame en/of parent verbreedt primary iframe | | |
+| 10 | Stream-host pagina met **grote** embed (≥ ~480×270) | Iframe embed | Stretch in het frame zelf (de parent-pagina wordt niet meer aangepast) | | |
 | 11 | **TvSportsLive** (of vergelijkbaar) + embedsports/viduki | Iframe + override | Embed breed; theater werkt | | |
 | 12 | Kleine widget-embed (tweet/video card, smalle iframe) | Iframe | **Geen** agressieve stretch | | |
 
@@ -96,7 +96,7 @@ Alternatief DRM als Netflix niet kan: Disney+/Prime/other — noteer welke.
 | 22 | Extensie-pagina errors | Geen `Unchecked runtime.lastError` | | |
 | 23 | Popup toont spelertype van huidige tab | YouTube = MSE, Netflix = DRM, embed-site = Iframe-embed | | |
 | 24 | Spelertype **MSE** uit -> YouTube fullscreen | Geen stretch; native/embed-sites wel | | |
-| 25 | Spelertype **embed** uit | Geen frame-stretch en geen parent-iframe verbreding | | |
+| 25 | Spelertype **embed** uit | Geen frame-stretch | | |
 | 26 | Spelertype weer aan | Stretch komt terug zonder tab-reload | | |
 | 27 | Popup met browsertaal NL / EN / DE | Teksten in die taal; "Automatisch" toont de gedetecteerde taal | | |
 | 28 | Taal handmatig wisselen in de dropdown | Alles hertaalt direct, ook lijsten, badges en statusregel | | |
