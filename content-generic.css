@@ -1,36 +1,49 @@
-/* Generic stretch — keep player chrome intact so native fullscreen keeps working. */
-
 /*
- * Scope: only videos the engine actually selected (marked with data-ws-fill)
- * are ever touched. Unmarked videos (thumbnails, previews, background loops,
- * portrait clips still loading metadata) must stay exactly as the site had them.
+ * The fill, in full.
+ *
+ * Scope: only a video the script marked with data-ws-fill is ever touched, and
+ * never one marked data-ws-portrait. Thumbnails, previews, background loops and
+ * portrait clips stay exactly as the site had them.
+ *
+ * Outside fullscreen nothing here changes the size or position of anything. The
+ * <video> keeps the box the player gave it and only the picture is stretched to
+ * fill that box. Growing the element was what used to fight the player's own
+ * layout — a site whose player letterboxes by sizing the element itself gets a
+ * css entry in the remote config instead of a guess made here.
  */
 
-/* Landscape video fill only (no absolute reposition of player shells). */
-html.ws-fill-active:not(.ws-fill-portrait) video[data-ws-fill] {
+/* Landscape fill: stretch the picture to the box, removing the bars. */
+html.ws-fill-active:not(.ws-fill-fsonly) video[data-ws-fill]:not([data-ws-portrait]) {
   object-fit: fill !important;
   object-position: center center !important;
 }
 
-html.ws-fill-active.ws-fill-portrait video[data-ws-fill] {
-  object-fit: contain !important;
+/*
+ * Fullscreen. The browser already knows, so no script tracks this — which also
+ * means there is no stale state left behind on the way out, and split-screen
+ * windows are no different from any other.
+ *
+ * Two cases, and they must stay in separate rules: an unknown selector would
+ * invalidate the whole list, and this is exactly where vendor differences live.
+ */
+
+/* The video element is itself the fullscreen element: the UA already sizes it. */
+html.ws-fill-active video[data-ws-fill]:not([data-ws-portrait]):fullscreen {
+  object-fit: fill !important;
+  object-position: center center !important;
 }
 
-/* Large on-page / fullscreen / pseudo-FS / embed: fill the video box */
-html.ws-fill-active.ws-fill-page:not(.ws-fill-portrait) video[data-ws-fill],
-html.ws-fill-active.ws-fill-fs:not(.ws-fill-portrait) video[data-ws-fill],
-html.ws-fill-active.ws-fill-pseudo:not(.ws-fill-portrait) video[data-ws-fill],
-html.ws-fill-active.ws-fill-embed:not(.ws-fill-portrait) video[data-ws-fill] {
+/* The video sits inside a fullscreen player shell: grow it to that shell's box. */
+html.ws-fill-active :fullscreen video[data-ws-fill]:not([data-ws-portrait]) {
   width: 100% !important;
   height: 100% !important;
   max-width: none !important;
   max-height: none !important;
+  object-fit: fill !important;
+  object-position: center center !important;
 }
 
-/* Primary stream iframe on parent pages (structural adapter) */
-html.ws-fill-active.ws-fill-page iframe[data-ws-fill="iframe"] {
-  width: 100% !important;
-  max-width: none !important;
-  display: block !important;
-  aspect-ratio: auto !important;
+/* A portrait clip is never stretched, in any context. */
+html.ws-fill-active video[data-ws-fill][data-ws-portrait] {
+  object-fit: contain !important;
 }
