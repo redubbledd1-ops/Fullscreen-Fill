@@ -9,11 +9,13 @@ AMO de privacyverklaring als *tekst* wil in plaats van als URL.
 ## Summary (max 250)
 
 ```
-Stretch landscape video to fill the whole window: no black bars, no zoom crop, nothing cut off. Works in fullscreen and on-page, on HTML5, MSE, DRM and iframe players. Switch it off per page, per site or per player type.
+Landscape video stretched to fill your whole window: no black bars, no zoom crop, nothing cut off. Works on most video sites, both in fullscreen and on the page. Turn it off per page or per site whenever you want.
 ```
 
-220 tekens. Reviewers gebruiken dit veld om te bepalen wat ze moeten testen, dus
-het noemt expliciet de spelertypes en de uit-knoppen.
+213 tekens. AMO zegt erbij dat reviewers dit veld gebruiken om te bepalen wat ze
+testen, maar het staat vooral in zoekresultaten bij gewone gebruikers. Daar zegt
+"MSE" niemand iets. De technische opsomming hoort in *Notes to Reviewer*: dat
+veld is privé en heeft geen limiet.
 
 ## Description
 
@@ -166,6 +168,19 @@ zip is byte-identical to the repository contents plus that manifest swap.
   cd Fullscreen-Fill
   node tools/build.js firefox     # -> dist/firefox
   python tools/pack.py firefox    # -> dist/firefox-<version>.zip
+
+PLAYER TYPES
+The engine recognises four kinds of player and applies different CSS to each:
+native HTML5, MSE (YouTube and most streaming sites), players inside iframes,
+and DRM-protected players. The popup names the type it detected for the current
+tab, and each type can be switched off individually.
+
+To be explicit about the last one: the extension does not touch content
+protection in any way. It applies CSS to a <video> element the page itself
+created. It does not read, decode, capture, record or save any video data, and
+it has no access to the protected stream. DRM players are a separate "type"
+purely because they need different CSS rules, not because the extension
+interacts with the protection.
 
 HOW TO SEE IT WORKING
 The extension only acts when the video's aspect ratio differs from the window,
