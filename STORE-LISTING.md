@@ -98,6 +98,12 @@ invult.
   Na de eerste inzending ligt die vast: wijzigen maakt er een nieuwe add-on van.
 - Bij "compatibiliteit" **Android** aanvinken; `gecko_android.strict_min_version`
   staat al in het manifest.
+- `data_collection_permissions` is verplicht voor elke nieuwe extensie; zonder die
+  sleutel wordt de zip bij de validatie geweigerd. Hij staat op `{"required":
+  ["none"]}` omdat de extensie niets verzamelt of verstuurt: de enige fetch naar
+  buiten is de config-URL die de gebruiker zelf invult, en daar gaat geen gegeven
+  over de gebruiker in mee. `none` mag niet met andere waarden gecombineerd
+  worden. Firefox toont dit bij de installatie en op de AMO-pagina.
 - Broncode-toelichting is niet nodig: er zit geen build-stap of minificatie in de
   ingediende map. `tools/build.js` kopieert alleen bestanden en kiest het juiste
   manifest.

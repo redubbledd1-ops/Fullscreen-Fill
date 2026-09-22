@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.19.0",
+  "version": "1.19.1",
   "description": "__MSG_extDesc__",
   "action": {
     "default_title": "__MSG_extName__",
@@ -58,7 +58,12 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "fullscreen-fill@redubbledd1-ops.github.io",
-      "strict_min_version": "127.0"
+      "strict_min_version": "127.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
     },
     "gecko_android": {
       "strict_min_version": "127.0"
