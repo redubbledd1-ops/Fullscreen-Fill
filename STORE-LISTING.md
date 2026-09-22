@@ -104,6 +104,10 @@ invult.
   buiten is de config-URL die de gebruiker zelf invult, en daar gaat geen gegeven
   over de gebruiker in mee. `none` mag niet met andere waarden gecombineerd
   worden. Firefox toont dit bij de installatie en op de AMO-pagina.
+- De ondergrens staat daarom op Firefox **140** en Firefox Android **142**: dat
+  zijn de versies die `data_collection_permissions` kennen. Lager zetten levert
+  een validatiewaarschuwing op dat de sleutel daar nog niet bestaat. Het kost
+  geen publiek — Firefox stond in september 2026 op 155 en zelfs ESR op 153.
 - Broncode-toelichting is niet nodig: er zit geen build-stap of minificatie in de
   ingediende map. `tools/build.js` kopieert alleen bestanden en kiest het juiste
   manifest.

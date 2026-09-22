@@ -16,7 +16,7 @@ Afvinken per regel; datum + bevinding erachter.
 | 1.5 | Buildscript dat `dist/chrome` en `dist/firefox` vult | ✅ | `node tools/build.js` |
 | 1.6 | Laden via `about:debugging` → tijdelijke add-on, smoke-test | ⬜ | |
 | 1.7 | Checklist A–G draaien in Firefox desktop | ⬜ | verschillen noteren |
-| 1.8 | Host-permissies MV3: controleren of "Toestaan op alle sites" nodig is bij installatie | ⬜ | Firefox ≥127 vraagt dit bij installatie |
+| 1.8 | Host-permissies MV3: controleren of "Toestaan op alle sites" nodig is bij installatie | ⬜ | Firefox vraagt dit bij installatie |
 | 1.9 | Fullscreen-detectie in Gecko: `mozFullScreenElement` verouderd, `fullscreenElement` zou moeten volstaan | ✅ | `fullscreenElement` wordt eerst gelezen; de oude varianten zijn onschadelijke fallbacks |
 
 ## Fase 2 — Firefox Android
