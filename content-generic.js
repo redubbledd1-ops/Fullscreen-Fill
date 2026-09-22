@@ -26,6 +26,7 @@
     mainVideoMinWidthRatio: 0.5,
     mainVideoMinHeightRatio: 0.32,
     pseudoFsMinCoverRatio: 0.92,
+    pseudoFsExitCoverDelta: 0.08,
     embedMinWidth: 480,
     embedMinHeight: 270,
     embedVideoMinAreaRatio: 0.45,
@@ -40,6 +41,7 @@
       mainVideoMinWidth: 240,
       mainVideoMinHeight: 120,
       pseudoFsMinCoverRatio: 0.85,
+      pseudoFsExitCoverDelta: 0.08,
       embedMinWidth: 280,
       embedMinHeight: 140,
       embedVideoMinAreaRatio: 0.25,
@@ -57,6 +59,8 @@
   let tuning = generic;
 
   const inIframe = window !== window.top;
+  /** When we last wrote or reverted a style ourselves. */
+  let selfWriteAt = 0;
   let applyTimer = 0;
   let lastAppliedKey = "";
   let remoteCfg = null;
@@ -221,10 +225,22 @@
     return visibleVideos().some(isMainPlayerVideo);
   }
 
-  function findPseudoFullscreenRoot(video) {
+  /**
+   * True while the page is already being treated as pseudo-fullscreen. The
+   * cover ratio is measured on a player we have stretched ourselves, so a bare
+   * threshold flips on our own effect: stretch pushes the box over the line,
+   * the wider styles change the box again, and the next pass reads it as under
+   * the line. The exit threshold sits below the entry one to break that.
+   */
+  let pseudoLatched = false;
+
+  function findPseudoFullscreenRoot(video, relaxed = false) {
     if (!video || isFullscreen()) return null;
     const { vw, vh } = viewportSize();
-    const minCover = tuning.pseudoFsMinCoverRatio ?? 0.92;
+    const enterCover = tuning.pseudoFsMinCoverRatio ?? 0.92;
+    const minCover = relaxed
+      ? enterCover - (tuning.pseudoFsExitCoverDelta ?? 0.08)
+      : enterCover;
 
     let el = video;
     while (el && el !== document.documentElement) {
@@ -245,9 +261,21 @@
 
   function isPseudoFullscreen() {
     const video = primaryVideo();
-    if (!video) return false;
-    return Boolean(findPseudoFullscreenRoot(video));
+    if (!video) {
+      pseudoLatched = false;
+      return false;
+    }
+    pseudoLatched = Boolean(findPseudoFullscreenRoot(video, pseudoLatched));
+    return pseudoLatched;
   }
+
+  /**
+   * The shell we size against, cached per epoch. The ancestor walk below picks
+   * by viewport ratio, and those ratios are the ones we just changed, so asking
+   * again each pass could land on a different ancestor and restyle the player
+   * around it. Fullscreen and hint roots are authoritative and stay live.
+   */
+  const playerRootCache = new WeakMap();
 
   function findPlayerRoot(video) {
     if (!video) return null;
@@ -258,8 +286,18 @@
     const hinted = hintedFullscreenPlayer();
     if (hinted && hinted.contains(video)) return hinted;
 
-    const pseudo = findPseudoFullscreenRoot(video);
+    const pseudo = findPseudoFullscreenRoot(video, pseudoLatched);
     if (pseudo) return pseudo;
+
+    const cached = playerRootCache.get(video);
+    if (
+      cached &&
+      cached.epoch === hintEpoch &&
+      cached.root?.isConnected &&
+      cached.root.contains(video)
+    ) {
+      return cached.root;
+    }
 
     const { vw, vh } = viewportSize();
     let best = video.parentElement;
@@ -273,6 +311,7 @@
       }
       el = el.parentElement;
     }
+    playerRootCache.set(video, { epoch: hintEpoch, root: best });
     return best;
   }
 
@@ -339,7 +378,7 @@
     // Orientation unknown yet (no loadedmetadata): staying off avoids stretching
     // a portrait clip and avoids filling a box the player has not sized yet.
     const primary = primaryVideo();
-    if (primary && WsFillConfig.portraitState(primary) === null) {
+    if (primary && orientationOf(primary) === null) {
       primary.addEventListener("loadedmetadata", onVideoMetadata, {
         once: true,
       });
@@ -363,10 +402,32 @@
     return false;
   }
 
+  /**
+   * Last orientation we actually measured, per video.
+   *
+   * videoWidth/videoHeight drop to 0 while a stream seeks or switches
+   * representation, so portraitState reports "unknown" for a few frames in the
+   * middle of playback. Taken at face value that tears the whole fill down and
+   * builds it back up — the screen jumps every time you scrub. The orientation
+   * of a clip does not change mid-playback, so keep the last real answer.
+   */
+  const lastOrientation = new WeakMap();
+
+  function orientationOf(video) {
+    if (!video) return null;
+    const state = WsFillConfig.portraitState(video);
+    if (state !== null) {
+      lastOrientation.set(video, state);
+      return state;
+    }
+    const known = lastOrientation.get(video);
+    return known === undefined ? null : known;
+  }
+
   function primaryPortrait() {
     const video = primaryVideo();
     if (!video) return null;
-    return WsFillConfig.portraitState(video);
+    return orientationOf(video);
   }
 
   /**
@@ -376,6 +437,34 @@
    * instead of deleting the property.
    */
   const originalInline = new WeakMap();
+
+  /**
+   * Geometry the player recomputes for itself. A value captured in fullscreen
+   * describes the whole screen, so writing it back in windowed mode leaves the
+   * video sized for a display it no longer lives on (visible as a cropped,
+   * off-centre picture, worst in a split-screen half-width window).
+   */
+  const GEOMETRY_PROPS = new Set([
+    "width",
+    "height",
+    "left",
+    "top",
+    "right",
+    "bottom",
+    "inset",
+    "position",
+    "max-width",
+    "max-height",
+    "transform",
+    "aspect-ratio",
+    "padding-top",
+    "padding-bottom",
+  ]);
+
+  /** Which layout the page was in when we captured its inline styles. */
+  function layoutStamp() {
+    return isFullscreen() || isHintedFullscreen() ? "fs" : "win";
+  }
 
   function rememberInline(el, prop) {
     let saved = originalInline.get(el);
@@ -387,25 +476,66 @@
     saved.set(prop, {
       value: el.style.getPropertyValue(prop),
       priority: el.style.getPropertyPriority(prop),
+      stamp: layoutStamp(),
     });
   }
 
-  /** Undo only our own properties on this element; leave the rest alone. */
+  /** Put one property back the way the page had it. */
+  function restoreProp(el, prop, prev) {
+    const stale = prev.stamp !== layoutStamp() && GEOMETRY_PROPS.has(prop);
+    selfWriteAt = Date.now();
+    if (prev.value && !stale) {
+      el.style.setProperty(prop, prev.value, prev.priority);
+      return false;
+    }
+    el.style.removeProperty(prop);
+    return Boolean(stale && prev.value);
+  }
+
+  /**
+   * Undo only our own properties on this element; leave the rest alone.
+   * Returns true when stale geometry was dropped instead of written back, so
+   * the caller can ask the page to re-measure.
+   */
   function restoreFill(el) {
-    if (!el) return;
+    if (!el) return false;
     const saved = originalInline.get(el);
+    let dropped = false;
     if (saved) {
       for (const [prop, prev] of saved) {
-        if (prev.value) el.style.setProperty(prop, prev.value, prev.priority);
-        else el.style.removeProperty(prop);
+        if (restoreProp(el, prop, prev)) dropped = true;
       }
       originalInline.delete(el);
     }
+    appliedProps.delete(el);
     el.removeAttribute(MARK);
+    return dropped;
+  }
+
+  let relayoutTimer = 0;
+
+  /**
+   * We removed sizing the player had written itself. Players size on window
+   * resize, so a synthetic resize makes them put correct values back.
+   */
+  function nudgeRelayout() {
+    if (relayoutTimer) return;
+    relayoutTimer = window.setTimeout(() => {
+      relayoutTimer = 0;
+      try {
+        window.dispatchEvent(new Event("resize"));
+      } catch {
+        /* no dispatch */
+      }
+    }, 0);
   }
 
   function clearMarkedStyles() {
-    document.querySelectorAll(`[${MARK}]`).forEach(restoreFill);
+    let dropped = false;
+    document.querySelectorAll(`[${MARK}]`).forEach((el) => {
+      if (restoreFill(el)) dropped = true;
+    });
+    if (dropped) nudgeRelayout();
   }
 
   function clearAllVideoStretch() {
@@ -413,12 +543,73 @@
     clearMarkedStyles();
   }
 
+  /**
+   * Properties we currently hold on an element (el -> Set<prop>), and the set
+   * being built by the pass in flight. Re-applying identical styles every pass
+   * made the video visibly jump: the page mutates its DOM constantly while a
+   * video plays, so a pass ran several times a second, and each one dropped our
+   * styles and put them straight back. Writing only actual differences means a
+   * pass that changes nothing touches nothing.
+   */
+  const appliedProps = new WeakMap();
+  let passProps = null;
+
+  function beginPass() {
+    passProps = new Map();
+  }
+
+  /** Revert properties held from earlier passes that this pass no longer wants. */
+  function endPass() {
+    if (!passProps) return;
+    const pass = passProps;
+    passProps = null;
+
+    let dropped = false;
+    document.querySelectorAll(`[${MARK}]`).forEach((el) => {
+      const next = pass.get(el);
+      if (!next) {
+        if (restoreFill(el)) dropped = true;
+        return;
+      }
+      const prev = appliedProps.get(el);
+      const saved = originalInline.get(el);
+      if (prev && saved) {
+        for (const prop of prev) {
+          if (next.has(prop)) continue;
+          const was = saved.get(prop);
+          if (!was) continue;
+          if (restoreProp(el, prop, was)) dropped = true;
+          saved.delete(prop);
+        }
+      }
+      appliedProps.set(el, next);
+    });
+    if (dropped) nudgeRelayout();
+  }
+
   function markFill(el, props, kind = "1") {
     if (!el) return;
     el.setAttribute(MARK, kind);
+
+    let held = passProps?.get(el);
+    if (passProps && !held) {
+      held = new Set();
+      passProps.set(el, held);
+    }
+
     for (const [prop, value] of Object.entries(props)) {
       if (value === "" || value == null) continue;
+      held?.add(prop);
       rememberInline(el, prop);
+      // Skip the write when it would be a no-op: a style write invalidates
+      // layout even when the value is unchanged.
+      if (
+        el.style.getPropertyValue(prop) === value &&
+        el.style.getPropertyPriority(prop) === "important"
+      ) {
+        continue;
+      }
+      selfWriteAt = Date.now();
       el.style.setProperty(prop, value, "important");
     }
   }
@@ -435,6 +626,92 @@
     const s = transform.match(/scale\(\s*([-\d.]+)/i);
     if (s) return Math.abs(parseFloat(s[1])) || 1;
     return 1;
+  }
+
+  /**
+   * Letterbox verdicts stay valid until the layout context changes. Measuring
+   * again while we hold styles on the element reads back our own work — we
+   * zeroed the padding and cleared the aspect-ratio, so the very hints that
+   * told us to do it are gone, and the next pass would undo them. Anything
+   * that can genuinely change the page's layout bumps the epoch and clears our
+   * styles first, so every measurement is taken on an untouched element.
+   */
+  const hintCache = new WeakMap();
+  let hintEpoch = 0;
+
+  function invalidateLayoutState() {
+    hintEpoch += 1;
+    pseudoLatched = false;
+    clearMarkedStyles();
+    lastAppliedKey = "";
+  }
+
+  /**
+   * Every structural decision above is cached per epoch, so something has to
+   * notice when the page itself relayouts — a theater-mode toggle changes no
+   * window size and fires no event of its own. A ResizeObserver on the video
+   * and its shell is that signal, but only when the new size differs from what
+   * we recorded at the end of our last pass and we did not just write styles
+   * ourselves. Both guards are needed: without them we would react to our own
+   * stretch and re-enter forever.
+   */
+  const SELF_WRITE_QUIET_MS = 300;
+  const lastBox = new WeakMap();
+  const observedBoxes = new WeakSet();
+  let boxTimer = 0;
+
+  function boxOf(el) {
+    const r = el.getBoundingClientRect();
+    return { w: Math.round(r.width), h: Math.round(r.height) };
+  }
+
+  function rememberBox(el) {
+    if (el) lastBox.set(el, boxOf(el));
+  }
+
+  function boxChanged(el) {
+    const prev = lastBox.get(el);
+    if (!prev) return false;
+    const now = boxOf(el);
+    return (
+      Math.abs(now.w - prev.w) > Math.max(4, prev.w * 0.02) ||
+      Math.abs(now.h - prev.h) > Math.max(4, prev.h * 0.02)
+    );
+  }
+
+  const boxObserver =
+    typeof ResizeObserver === "function"
+      ? new ResizeObserver((entries) => {
+          if (Date.now() - selfWriteAt < SELF_WRITE_QUIET_MS) {
+            entries.forEach((e) => rememberBox(e.target));
+            return;
+          }
+          if (!entries.some((e) => boxChanged(e.target))) return;
+          if (boxTimer) return;
+          boxTimer = window.setTimeout(() => {
+            boxTimer = 0;
+            invalidateLayoutState();
+            scheduleApply();
+          }, 120);
+        })
+      : null;
+
+  function watchBox(el) {
+    if (!el || !boxObserver || observedBoxes.has(el)) return;
+    observedBoxes.add(el);
+    try {
+      boxObserver.observe(el);
+    } catch {
+      /* detached */
+    }
+  }
+
+  function letterboxHintsFor(el) {
+    const cached = hintCache.get(el);
+    if (cached && cached.epoch === hintEpoch) return cached.hints;
+    const hints = letterboxHints(el);
+    hintCache.set(el, { epoch: hintEpoch, hints });
+    return hints;
   }
 
   /**
@@ -518,20 +795,41 @@
     "button, a[href], input, select, textarea, [role=\"button\"], " +
     "[role=\"slider\"], [role=\"menu\"], [role=\"menuitem\"], [tabindex]";
 
-  /** A wrapper that holds controls is part of the player UI, not a letterbox. */
+  /**
+   * A wrapper that holds controls is part of the player UI, not a letterbox.
+   *
+   * Latched, because players add and remove their control bar as the pointer
+   * moves over the video. Asking live made the answer flip on hover alone, and
+   * with it whether we pinned this box — the video jumped every time the mouse
+   * reached the buttons. A box that has ever held controls is player UI and
+   * stays that way.
+   */
+  const everHeldControls = new WeakSet();
+
   function holdsControls(el) {
     if (!el) return false;
+    if (everHeldControls.has(el)) return true;
+    let found = false;
     try {
-      return Boolean(el.querySelector(CONTROL_SELECTOR));
+      found = Boolean(el.querySelector(CONTROL_SELECTOR));
     } catch {
       return false;
     }
+    if (found) everHeldControls.add(el);
+    return found;
   }
 
   /**
    * Absolute fill needs the player shell to be the containing block and to have
    * a usable box. Make it position:relative when it is static.
+   *
+   * The verdict is cached per epoch: after we set position:relative, reading
+   * the position back reports our own value, so a live check would decide the
+   * shell no longer needs it, drop it the same pass, and hand the pinned video
+   * a different containing block — a visible jump, every pass.
    */
+  const anchorCache = new WeakMap();
+
   function canAnchorFill(root) {
     if (!root || root === document.body || root === document.documentElement) {
       return false;
@@ -539,13 +837,24 @@
     const r = root.getBoundingClientRect();
     if (r.width < (tuning.mainVideoMinWidth ?? 280)) return false;
     if (r.height < (tuning.mainVideoMinHeight ?? 160)) return false;
-    let pos = "static";
-    try {
-      pos = getComputedStyle(root).position;
-    } catch {
-      return false;
+
+    const cached = anchorCache.get(root);
+    let needsRelative;
+    if (cached && cached.epoch === hintEpoch) {
+      needsRelative = cached.needsRelative;
+    } else {
+      let pos = "static";
+      try {
+        pos = getComputedStyle(root).position;
+      } catch {
+        return false;
+      }
+      needsRelative = pos === "static";
+      anchorCache.set(root, { epoch: hintEpoch, needsRelative });
     }
-    if (pos === "static") markFill(root, { position: "relative" }, "wrap");
+
+    // Re-assert every pass so the property stays in this pass's held set.
+    if (needsRelative) markFill(root, { position: "relative" }, "wrap");
     return true;
   }
 
@@ -570,13 +879,13 @@
 
     let el = video.parentElement;
     while (el && el !== root && el !== document.body) {
-      const hints = letterboxHints(el);
+      const hints = letterboxHintsFor(el);
       if (hints.any) adaptLetterboxNode(el, hints);
       el = el.parentElement;
     }
 
     // Soft-adapt the shell itself when it letterboxes.
-    const rootHints = letterboxHints(root);
+    const rootHints = letterboxHintsFor(root);
     if (rootHints.any) {
       const props = {
         "max-width": "none",
@@ -734,7 +1043,7 @@
     let el = iframe.parentElement;
     let hops = 0;
     while (el && el !== document.body && hops < 4) {
-      const hints = letterboxHints(el);
+      const hints = letterboxHintsFor(el);
       if (hints.any || hints.maxBox) {
         markFill(
           el,
@@ -765,7 +1074,7 @@
       return;
     }
 
-    clearMarkedStyles();
+    beginPass();
 
     const fsOrPseudo =
       isFullscreen() || isPseudoFullscreen() || isHintedFullscreen();
@@ -792,7 +1101,7 @@
         return;
       }
 
-      const state = WsFillConfig.portraitState(video);
+      const state = orientationOf(video);
       if (state === true) {
         restoreFill(video);
         return;
@@ -806,6 +1115,20 @@
         deepFill: fsOrPseudo || inIframe,
       });
     });
+
+    endPass();
+
+    // Baseline for the box observer: the sizes our own work just settled on.
+    const watched = primaryVideo();
+    if (watched) {
+      const shell = findPlayerRoot(watched);
+      watchBox(watched);
+      rememberBox(watched);
+      if (shell) {
+        watchBox(shell);
+        rememberBox(shell);
+      }
+    }
   }
 
   function apply() {
@@ -927,7 +1250,7 @@
   });
 
   const hintObserver = new MutationObserver(() => {
-    lastAppliedKey = "";
+    invalidateLayoutState();
     scheduleApply();
   });
   const watchedHintPlayers = new WeakSet();
@@ -959,7 +1282,7 @@
         if (!name || seen.has(name)) continue;
         seen.add(name);
         document.addEventListener(name, () => {
-          lastAppliedKey = "";
+          invalidateLayoutState();
           scheduleApply();
         });
       }
@@ -972,22 +1295,42 @@
     scheduleApply();
   });
 
-  document.addEventListener("fullscreenchange", () => {
-    lastAppliedKey = "";
+  /**
+   * The player rewrites its own inline geometry a frame or two after the event
+   * fires, and the class a fullscreenHint keys on can lag too. Re-check after
+   * the page settles so the previous state's sizing is never what sticks.
+   */
+  function onFullscreenChange() {
+    invalidateLayoutState();
     apply();
-  });
-  document.addEventListener("webkitfullscreenchange", () => {
-    lastAppliedKey = "";
-    apply();
-  });
+    window.requestAnimationFrame(() => {
+      lastAppliedKey = "";
+      apply();
+    });
+    window.setTimeout(() => {
+      lastAppliedKey = "";
+      apply();
+    }, 250);
+  }
+
+  document.addEventListener("fullscreenchange", onFullscreenChange);
+  document.addEventListener("webkitfullscreenchange", onFullscreenChange);
   window.addEventListener("popstate", () => {
-    lastAppliedKey = "";
+    invalidateLayoutState();
     scheduleApply();
   });
 
+  let resizeTimer = 0;
   window.addEventListener("resize", () => {
+    // Our own nudgeRelayout dispatches resize, and players resize themselves in
+    // bursts. Re-measure once the burst is over, not per event.
     lastAppliedKey = "";
-    scheduleApply();
+    if (resizeTimer) window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(() => {
+      resizeTimer = 0;
+      invalidateLayoutState();
+      scheduleApply();
+    }, 150);
   });
 
   function marksLost() {
@@ -1004,14 +1347,14 @@
     if (!enabled || document.hidden) return;
     if (location.href !== lastUrl) {
       lastUrl = location.href;
-      lastAppliedKey = "";
+      invalidateLayoutState();
       watchHintedPlayers();
       scheduleApply();
       return;
     }
     // The page re-rendered the player and dropped our inline styles.
     if (marksLost()) {
-      lastAppliedKey = "";
+      invalidateLayoutState();
       scheduleApply();
     }
   }, 1000);
