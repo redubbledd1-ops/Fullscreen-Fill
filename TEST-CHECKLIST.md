@@ -117,6 +117,8 @@ Alternatief DRM als Netflix niet kan: Disney+/Prime/other — noteer welke.
 | 36 | Popup op telefoon | Vinkjes/knoppen met vinger te raken, geen horizontale scroll | | |
 | 37 | Tab naar achtergrond, later terug | Geen werk in de achtergrond; bij terugkeer meteen correct | | |
 | 38 | Accu/CPU tijdens 10 min video | Geen merkbare extra belasting | | |
+| 39 | YouTube (m.youtube.com) → fullscreen, 10 s kijken **zonder** aan te raken | Beeld staat stil in fill: geen knipperen, geen zwarte flitsen | | |
+| 40 | Andere site met eigen speler → fullscreen op telefoon, idem | Idem 39; bediening blijft te raken | | |
 
 ---
 

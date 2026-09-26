@@ -270,6 +270,20 @@
   }
 
   /**
+   * In fullscreen a marked video is sized by our own stylesheet, so the box the
+   * observer reports is our work, not the player's. Judging that box again is
+   * the feedback loop described at the top of this file: whatever size our css
+   * produces decides whether our css applies. A video that was the player when
+   * fullscreen began stays the player until it ends; on the way out the
+   * stylesheet lets go, the box changes, and the observer judges it afresh.
+   */
+  function heldByFullscreen(video) {
+    if (!video.hasAttribute(MARK)) return false;
+    const shell = document.fullscreenElement || document.webkitFullscreenElement;
+    return Boolean(shell && shell !== video && shell.contains(video));
+  }
+
+  /**
    * Decide the two attributes for one video. No layout is read: the size comes
    * from the observer and the orientation from the decoded stream.
    */
@@ -284,7 +298,7 @@
     const fill =
       siteAllowed &&
       orientation !== null &&
-      isPlayerSized(w, h) &&
+      (heldByFullscreen(video) || isPlayerSized(w, h)) &&
       typeAllowed(video);
 
     if (fill) video.setAttribute(MARK, "1");

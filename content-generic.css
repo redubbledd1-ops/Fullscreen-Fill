@@ -33,8 +33,23 @@ html.ws-fill-active video[data-ws-fill]:not([data-ws-portrait]):fullscreen {
   object-position: center center !important;
 }
 
-/* The video sits inside a fullscreen player shell: grow it to that shell's box. */
-html.ws-fill-active :fullscreen video[data-ws-fill]:not([data-ws-portrait]) {
+/*
+ * The video sits inside a fullscreen player shell: grow it to that shell's box.
+ *
+ * The shell always covers the viewport, so the viewport is the box to fill —
+ * not the video's parent. A percentage height resolves against the parent, and
+ * mobile YouTube wraps the video in a container 0px tall: height:100% made the
+ * video 0px, the script saw a video too small to fill, dropped the mark, the
+ * player's own size came back, the mark went on again, and the screen flickered
+ * between the two every frame.
+ *
+ * :where() keeps this rule at the bottom of the cascade, so a site's css entry
+ * in the remote config that positions the video itself always wins.
+ */
+html.ws-fill-active :fullscreen :where(video[data-ws-fill]:not([data-ws-portrait])) {
+  position: fixed !important;
+  inset: 0 !important;
+  margin: 0 !important;
   width: 100% !important;
   height: 100% !important;
   max-width: none !important;
