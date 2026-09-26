@@ -34,7 +34,9 @@ zoom and crop - so nothing is cut off the top, bottom or sides.
 - Interface follows your browser language (English, Dutch, German, French,
   Spanish) and can be switched by hand.
 
-No accounts, no analytics, no data collection. The only network request the
+No accounts, no analytics, nothing sent in the background. Bug reports are
+written and sent by you, with device or site details only if you tick them.
+The only network request the
 extension can make is fetching a configuration URL that you enter yourself.
 ```
 
@@ -55,7 +57,9 @@ en snijdt niet bij - dus er valt niets weg aan de boven-, onder- of zijkant.
 - De interface volgt je browsertaal (Nederlands, Engels, Duits, Frans, Spaans)
   en is handmatig te wisselen.
 
-Geen account, geen analytics, geen gegevensverzameling. Het enige netwerkverzoek
+Geen account, geen analytics, niets op de achtergrond verstuurd. Meldingen schrijf
+en verstuur je zelf, met toestel- of sitegegevens alleen als je die aanvinkt.
+Het enige netwerkverzoek
 dat de extensie kan doen is het ophalen van een configuratie-URL die je zelf
 invult.
 ```
@@ -75,15 +79,19 @@ invult.
 |-------|-------|
 | `storage` | Stores the user's own settings: on/off, the URL blacklist, which player types are enabled and the interface language. |
 | `alarms` | Schedules a periodic check for an updated configuration file, only when the user has entered a configuration URL. |
-| `activeTab` | The popup reads the active tab's URL for the "block this page" action and asks the content script which player type that tab is running. |
+| `activeTab` | The popup reads the active tab's URL for the "block this page" action and for the "report a problem" form (domain only), and asks the content script which player type that tab is running. |
 | Host permission `*://*/*` | Video players exist on any website, so the content script has to be able to run on any site the user visits. The extension does not read page content; it measures video and iframe elements and applies CSS. |
 | Remote code | None. All code ships with the extension. The optional configuration URL returns JSON data (CSS strings and numeric thresholds), never executable code. |
 
 **Data usage disclosure**
 
-- Verzamelt geen gebruikersgegevens: geen persoonsgegevens, geen gezondheids-,
-  financiële, authenticatie- of locatiegegevens, geen persoonlijke communicatie,
-  geen surfgeschiedenis, geen website-inhoud.
+- Op de achtergrond gaat niets weg. Wel kan een gebruiker zelf een melding sturen
+  (GitHub-issue of mail); alleen als hij dat aanvinkt staan daar het **domein**
+  van de pagina en technische gegevens in. Vink daarom **Web history** aan, met
+  als toelichting: *only the domain of the current page, only inside a bug
+  report the user writes, ticks and sends themselves*. De rest blijft uit: geen
+  persoonsgegevens, gezondheids-, financiële, authenticatie- of locatiegegevens,
+  geen persoonlijke communicatie, geen website-inhoud.
 - Verkoopt niets aan derden, gebruikt niets voor advertenties, gebruikt niets
   voor kredietwaardigheid.
 - Privacyverklaring-URL:
@@ -99,11 +107,12 @@ invult.
 - Bij "compatibiliteit" **Android** aanvinken; `gecko_android.strict_min_version`
   staat al in het manifest.
 - `data_collection_permissions` is verplicht voor elke nieuwe extensie; zonder die
-  sleutel wordt de zip bij de validatie geweigerd. Hij staat op `{"required":
-  ["none"]}` omdat de extensie niets verzamelt of verstuurt: de enige fetch naar
-  buiten is de config-URL die de gebruiker zelf invult, en daar gaat geen gegeven
-  over de gebruiker in mee. `none` mag niet met andere waarden gecombineerd
-  worden. Firefox toont dit bij de installatie en op de AMO-pagina.
+  sleutel wordt de zip bij de validatie geweigerd. `required` staat op `["none"]`:
+  op de achtergrond gaat niets weg. `optional` noemt `technicalAndInteraction` en
+  `browsingActivity` voor het meldformulier; Firefox vraagt die pas als de
+  gebruiker "technische gegevens" of "site" aanvinkt. `none` mag niet met andere
+  *required*-waarden gecombineerd worden. Firefox toont dit bij de installatie en
+  op de AMO-pagina.
 - De ondergrens staat daarom op Firefox **140** en Firefox Android **142**: dat
   zijn de versies die `data_collection_permissions` kennen. Lager zetten levert
   een validatiewaarschuwing op dat de sleutel daar nog niet bestaat. Het kost

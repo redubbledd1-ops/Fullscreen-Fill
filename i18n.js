@@ -36,6 +36,24 @@ const WsFillI18n = (() => {
       aspectHint:
         "Narrower videos, square ones for example, are shown normally: the extension leaves them alone.",
       settingsTitle: "Settings",
+      reportOpen: "Report a problem",
+      report: "Report a problem",
+      reportWhat: "What went wrong?",
+      reportDevice: "Device (optional)",
+      reportDevicePlaceholder: "e.g. Pixel 8, Windows laptop",
+      reportSite: "Include the site ({host})",
+      reportTech: "Include technical details",
+      reportTechHint:
+        "Extension version, your settings, browser, operating system, screen size, and what the extension did on the page.",
+      reportPreviewLabel: "This is exactly what will be sent:",
+      reportGithub: "Report on GitHub",
+      reportMail: "Send by email",
+      reportPublicHint:
+        "GitHub needs an account, and the report is public there. Email stays private — you can also write to {email} yourself.",
+      reportDenied: "No permission given, so that stays out of the report.",
+      reportOpened: "GitHub opened in a new tab — send the issue there.",
+      reportMailOpened:
+        "Your mail app should open with the report — send it from there.",
 
       tabBusy: "Current tab: checking…",
       tabUnknown: "Current tab: unknown (reload the page after updating)",
@@ -127,6 +145,25 @@ const WsFillI18n = (() => {
       aspectHint:
         "Smallere video’s, bijvoorbeeld vierkante, worden normaal getoond: de extensie doet er dan niets mee.",
       settingsTitle: "Instellingen",
+      reportOpen: "Probleem melden",
+      report: "Probleem melden",
+      reportWhat: "Wat ging er mis?",
+      reportDevice: "Toestel (optioneel)",
+      reportDevicePlaceholder: "bijv. Samsung S24, Windows-laptop",
+      reportSite: "Site meesturen ({host})",
+      reportTech: "Technische gegevens meesturen",
+      reportTechHint:
+        "Versie van de extensie, je instellingen, browser, besturingssysteem, schermformaat en wat de extensie op de pagina deed.",
+      reportPreviewLabel: "Dit wordt precies verstuurd:",
+      reportGithub: "Melden via GitHub",
+      reportMail: "Mailen",
+      reportPublicHint:
+        "Voor GitHub heb je een account nodig, en de melding is daar openbaar. Een mail blijft privé — je kunt ook zelf mailen naar {email}.",
+      reportDenied: "Geen toestemming gegeven, dus dit gaat niet mee.",
+      reportOpened:
+        "GitHub is geopend in een nieuw tabblad — verstuur de melding daar.",
+      reportMailOpened:
+        "Je mail-app hoort te openen met de melding — verstuur hem daar.",
 
       tabBusy: "Huidige tab: bezig…",
       tabUnknown: "Huidige tab: onbekend (pagina herladen na update)",
@@ -218,6 +255,25 @@ const WsFillI18n = (() => {
       aspectHint:
         "Schmalere Videos, etwa quadratische, werden normal gezeigt: Die Erweiterung lässt sie in Ruhe.",
       settingsTitle: "Einstellungen",
+      reportOpen: "Problem melden",
+      report: "Problem melden",
+      reportWhat: "Was ist schiefgelaufen?",
+      reportDevice: "Gerät (optional)",
+      reportDevicePlaceholder: "z. B. Pixel 8, Windows-Laptop",
+      reportSite: "Website mitsenden ({host})",
+      reportTech: "Technische Angaben mitsenden",
+      reportTechHint:
+        "Version der Erweiterung, deine Einstellungen, Browser, Betriebssystem, Bildschirmgröße und was die Erweiterung auf der Seite getan hat.",
+      reportPreviewLabel: "Genau das wird gesendet:",
+      reportGithub: "Über GitHub melden",
+      reportMail: "Per E-Mail senden",
+      reportPublicHint:
+        "GitHub braucht ein Konto, und die Meldung ist dort öffentlich. Eine E-Mail bleibt privat – du kannst auch selbst an {email} schreiben.",
+      reportDenied: "Keine Zustimmung erteilt, also bleibt das draußen.",
+      reportOpened:
+        "GitHub wurde in einem neuen Tab geöffnet – sende die Meldung dort ab.",
+      reportMailOpened:
+        "Deine Mail-App sollte sich mit der Meldung öffnen – sende sie von dort.",
 
       tabBusy: "Aktueller Tab: wird geprüft…",
       tabUnknown: "Aktueller Tab: unbekannt (Seite nach dem Update neu laden)",
@@ -309,6 +365,25 @@ const WsFillI18n = (() => {
       aspectHint:
         "Les vidéos plus étroites, carrées par exemple, s’affichent normalement : l’extension n’y touche pas.",
       settingsTitle: "Réglages",
+      reportOpen: "Signaler un problème",
+      report: "Signaler un problème",
+      reportWhat: "Qu’est-ce qui n’a pas marché ?",
+      reportDevice: "Appareil (facultatif)",
+      reportDevicePlaceholder: "p. ex. Pixel 8, PC portable Windows",
+      reportSite: "Joindre le site ({host})",
+      reportTech: "Joindre les détails techniques",
+      reportTechHint:
+        "Version de l’extension, vos réglages, navigateur, système d’exploitation, taille d’écran et ce que l’extension a fait sur la page.",
+      reportPreviewLabel: "Voici exactement ce qui sera envoyé :",
+      reportGithub: "Signaler sur GitHub",
+      reportMail: "Envoyer par e-mail",
+      reportPublicHint:
+        "GitHub demande un compte, et le signalement y est public. Un e-mail reste privé — vous pouvez aussi écrire vous-même à {email}.",
+      reportDenied: "Pas d’autorisation donnée : ceci ne sera pas envoyé.",
+      reportOpened:
+        "GitHub s’est ouvert dans un nouvel onglet — envoyez le signalement là-bas.",
+      reportMailOpened:
+        "Votre application mail devrait s’ouvrir avec le signalement — envoyez-le depuis là.",
 
       tabBusy: "Onglet actuel : vérification…",
       tabUnknown: "Onglet actuel : inconnu (rechargez la page après la mise à jour)",
@@ -400,6 +475,25 @@ const WsFillI18n = (() => {
       aspectHint:
         "Los vídeos más estrechos, cuadrados por ejemplo, se muestran con normalidad: la extensión no los toca.",
       settingsTitle: "Ajustes",
+      reportOpen: "Informar de un problema",
+      report: "Informar de un problema",
+      reportWhat: "¿Qué ha fallado?",
+      reportDevice: "Dispositivo (opcional)",
+      reportDevicePlaceholder: "p. ej. Pixel 8, portátil Windows",
+      reportSite: "Incluir el sitio ({host})",
+      reportTech: "Incluir datos técnicos",
+      reportTechHint:
+        "Versión de la extensión, tus ajustes, navegador, sistema operativo, tamaño de pantalla y lo que hizo la extensión en la página.",
+      reportPreviewLabel: "Esto es exactamente lo que se enviará:",
+      reportGithub: "Informar en GitHub",
+      reportMail: "Enviar por correo",
+      reportPublicHint:
+        "GitHub pide una cuenta y allí el informe es público. Un correo sigue siendo privado; también puedes escribir tú a {email}.",
+      reportDenied: "No diste permiso, así que esto no se enviará.",
+      reportOpened:
+        "GitHub se abrió en una pestaña nueva: envía el informe desde allí.",
+      reportMailOpened:
+        "Tu app de correo debería abrirse con el informe: envíalo desde allí.",
 
       tabBusy: "Pestaña actual: comprobando…",
       tabUnknown: "Pestaña actual: desconocida (recarga la página tras actualizar)",

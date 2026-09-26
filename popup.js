@@ -24,6 +24,19 @@ const overLimitEls = document.querySelectorAll(".over-limit");
 const stretchLimitEl = document.getElementById("stretchLimit");
 const overLimitEl = document.getElementById("overLimit");
 const FILL_KEYS = Object.keys(WsFillConfig.FILL_DEFAULTS);
+const reportOpenBtn = document.getElementById("reportOpen");
+const reportPanel = document.getElementById("reportPanel");
+const reportText = document.getElementById("reportText");
+const reportDevice = document.getElementById("reportDevice");
+const reportSiteRow = document.getElementById("reportSiteRow");
+const reportSite = document.getElementById("reportSite");
+const reportSiteLabel = document.getElementById("reportSiteLabel");
+const reportTech = document.getElementById("reportTech");
+const reportPreview = document.getElementById("reportPreview");
+const reportGithub = document.getElementById("reportGithub");
+const reportMail = document.getElementById("reportMail");
+const reportPublicHint = document.getElementById("reportPublicHint");
+const reportStatus = document.getElementById("reportStatus");
 
 /** options.html sends the settings page here: the same page, minus the current tab. */
 const isOptionsView =
@@ -36,6 +49,12 @@ let fill = { ...WsFillConfig.FILL_DEFAULTS };
 let currentType = "";
 let lastState = null;
 let langPref = "auto";
+
+/** The tab a report started from, handed over by the popup: { host, state, at }. */
+let reportContext = null;
+let reportEnv = null;
+const REPORT_CONTEXT_TTL = 30 * 60 * 1000;
+const REPORT_OPEN_TTL = 60 * 1000;
 let locale = WsFillI18n.resolveLocale(langPref);
 
 function t(key, vars) {
@@ -93,6 +112,7 @@ function applyLanguage() {
   renderBlacklist();
   renderCurrentType();
   renderStatus();
+  renderReport();
 }
 
 function fillOption(value, text) {
@@ -400,6 +420,59 @@ async function loadCurrentType() {
   renderPlayerTypes();
 }
 
+// ------------------------------------------------------------ bug reports
+
+/** Only what the user typed, plus what they ticked. */
+function reportParts() {
+  const parts = { text: reportText.value, device: reportDevice.value };
+  if (reportSite.checked && reportContext?.host) parts.host = reportContext.host;
+  if (reportTech.checked && reportEnv) {
+    parts.tech = {
+      ...reportEnv,
+      settings: WsFillReport.describeSettings({
+        enabled: enabledEl.checked,
+        fill,
+        playerTypes,
+        blacklistCount: urlBlacklist.length,
+      }),
+      page: WsFillReport.describePage(reportContext?.state),
+    };
+  }
+  return parts;
+}
+
+function renderReport() {
+  reportSiteRow.hidden = !reportContext?.host;
+  reportSiteLabel.textContent = t("reportSite", { host: reportContext?.host || "" });
+  reportPublicHint.textContent = t("reportPublicHint", {
+    email: WsFillReport.EMAIL,
+  });
+  reportPreview.textContent = WsFillReport.body(reportParts());
+  const empty = !reportText.value.trim();
+  reportGithub.disabled = empty;
+  reportMail.disabled = empty;
+}
+
+async function loadReportContext() {
+  let focus = false;
+  try {
+    const data = await WsFillApi.storage.local.get(["reportContext", "reportOpen"]);
+    const ctx = data.reportContext;
+    reportContext =
+      ctx && Date.now() - ctx.at < REPORT_CONTEXT_TTL ? ctx : null;
+    focus = Boolean(data.reportOpen && Date.now() - data.reportOpen < REPORT_OPEN_TTL);
+    if (data.reportOpen) await WsFillApi.storage.local.remove("reportOpen");
+  } catch {
+    reportContext = null;
+  }
+  renderReport();
+  if (focus) {
+    reportPanel.open = true;
+    reportPanel.scrollIntoView({ block: "start" });
+    reportText.focus();
+  }
+}
+
 async function renderStatus() {
   try {
     const data = await WsFillApi.storage.local.get([
@@ -450,7 +523,15 @@ async function bootPopup() {
   }
 
   applyLanguage();
-  if (!isOptionsView) await loadCurrentType();
+  if (isOptionsView) {
+    WsFillReport.environment().then((env) => {
+      reportEnv = env;
+      renderReport();
+    });
+    await loadReportContext();
+  } else {
+    await loadCurrentType();
+  }
 }
 
 /** Some pages only pick up a changed setting (or an updated extension) on reload. */
@@ -552,8 +633,81 @@ refreshBtn.addEventListener("click", async () => {
   await renderStatus();
 });
 
+/**
+ * The report form lives on the settings page, which is a real tab: room to
+ * type, and Firefox's consent prompt cannot close it the way it can a popup.
+ * The popup hands over the tab it was opened on.
+ */
+reportOpenBtn.addEventListener("click", async () => {
+  let host = "";
+  try {
+    const tabs = await WsFillApi.tabs.query({ active: true, currentWindow: true });
+    const url = new URL(tabs[0]?.url || "");
+    if (/^https?:$/.test(url.protocol)) host = WsFillConfig.stripWww(url.hostname);
+  } catch {
+    /* no tab url */
+  }
+  try {
+    await WsFillApi.storage.local.set({
+      reportContext: { host, state: lastState || null, at: Date.now() },
+      reportOpen: Date.now(),
+    });
+    await WsFillApi.runtime.openOptionsPage();
+  } catch {
+    /* settings page unavailable */
+  }
+  window.close();
+});
+
+reportText.addEventListener("input", renderReport);
+reportDevice.addEventListener("input", renderReport);
+
+// Consent is asked from the click itself: Firefox only prompts while it is
+// handling the user's input.
+for (const [box, kind] of [
+  [reportTech, "tech"],
+  [reportSite, "site"],
+]) {
+  box.addEventListener("click", () => {
+    reportStatus.textContent = "";
+    if (!box.checked) {
+      renderReport();
+      return;
+    }
+    WsFillReport.askConsent(kind).then((ok) => {
+      if (!ok) {
+        box.checked = false;
+        reportStatus.textContent = t("reportDenied");
+      }
+      renderReport();
+    });
+  });
+}
+
+reportGithub.addEventListener("click", async () => {
+  const url = WsFillReport.githubUrl(reportParts());
+  try {
+    await WsFillApi.tabs.create({ url });
+  } catch {
+    window.open(url, "_blank");
+  }
+  reportStatus.textContent = t("reportOpened");
+});
+
+reportMail.addEventListener("click", () => {
+  const link = document.createElement("a");
+  link.href = WsFillReport.mailUrl(reportParts());
+  link.click();
+  reportStatus.textContent = t("reportMailOpened");
+});
+
 WsFillApi.storage.onChanged.addListener((changes, area) => {
-  if (area === "local") renderStatus();
+  if (area === "local") {
+    renderStatus();
+    // Settings page already open: the popup's report button focuses it
+    // without a reload.
+    if (isOptionsView && changes.reportOpen?.newValue) loadReportContext();
+  }
   if (area !== "sync") return;
   if (changes.uiLang) {
     langPref = changes.uiLang.newValue || "auto";
@@ -577,6 +731,7 @@ WsFillApi.storage.onChanged.addListener((changes, area) => {
     );
     renderBlacklist();
   }
+  renderReport();
 });
 
 if (isOptionsView) {

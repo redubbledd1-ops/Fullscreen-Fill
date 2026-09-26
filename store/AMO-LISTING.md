@@ -46,7 +46,9 @@ for a single page, a whole domain, or a player type you never want it on.
 The interface follows your browser language — English, Dutch, German, French or
 Spanish — and can be switched by hand.
 
-No accounts, no analytics, no data collection. The only network request the
+No accounts, no analytics, nothing sent in the background. Bug reports are
+written and sent by you, with device or site details only if you tick them.
+The only network request the
 extension can make is fetching a configuration URL that you enter yourself, and
 that field is empty until you fill it in.
 ```
@@ -71,12 +73,13 @@ goede is sterker dan drie halve.
 
 | Veld | Waarde |
 |------|--------|
-| Support email | **leeg laten** |
+| Support email | `fullscreenfill@gmail.com` |
 | Support website | `https://github.com/redubbledd1-ops/Fullscreen-Fill/issues` |
 
 Het e-mailadres komt openbaar op de add-on-pagina te staan en wordt geoogst door
-spammers. De issue-tracker doet hetzelfde werk, is openbaar te doorzoeken, en
-andere gebruikers zien elkaars meldingen.
+spammers, maar het staat sinds 1.23.0 toch al in de extensie zelf (Probleem
+melden → Mailen). Daarom een apart adres, niet je eigen Gmail. De issue-tracker
+blijft de plek waar andere gebruikers elkaars meldingen zien.
 
 ## License
 
@@ -104,9 +107,11 @@ Everything stays in your own browser's storage.
 | `enabled` | `storage.sync` | whether widescreen filling is on |
 | `urlBlacklist` | `storage.sync` | domains and URLs you excluded yourself |
 | `playerTypes` | `storage.sync` | which player types you switched off |
+| `fillMode`, `stretchLimit`, `overLimit`, `minAspect` | `storage.sync` | stretch or zoom, the stretch limit, what happens past it, and the narrowest video to fill |
 | `uiLang` | `storage.sync` | the popup language you picked |
 | `configUrl` | `storage.sync` | optional remote config URL you enter yourself |
 | `remoteConfig`, `configFetchedAt`, `configSource`, `configFetchError` | `storage.local` | the last loaded configuration and its status |
+| `reportContext`, `reportOpen` | `storage.local` | the domain and page status a bug report starts from (see *Bug reports*) |
 
 `storage.sync` means your browser syncs these settings between your own devices
 through your Google or Mozilla account. That runs through your browser, not
@@ -123,6 +128,33 @@ videos you watch or the device you use.
 Leave the field empty and the extension uses the configuration bundled with it,
 and no traffic leaves your machine at all.
 
+## Bug reports
+
+Nothing is sent in the background. When you choose **Report a problem**, the
+settings page shows the complete report before anything leaves your browser,
+and you send it yourself:
+
+- **Report on GitHub** opens a prefilled issue on github.com. That needs a GitHub
+  account, and the report is **public** there, under your GitHub name.
+- **Send by email** opens your own mail app with a prefilled message to
+  fullscreenfill@gmail.com. It stays between you and the developer.
+
+The report holds what you type: what went wrong and, if you like, your device.
+Two things are added only when you tick them, and on Firefox only after the
+browser's own consent prompt:
+
+- **the site**: only the domain, such as `youtube.com`, never the full address
+  (Firefox: *browsing activity*)
+- **technical details**: extension version, your settings (the blacklist only as
+  a count), browser and version, operating system, screen size, and what the
+  extension did on that page (Firefox: *technical and interaction data*)
+
+To carry the page you were on from the popup to the report form, the popup keeps
+that domain and page status in `storage.local` (`reportContext`). The form
+ignores it after 30 minutes, and the next report overwrites it.
+
+Reports are used for one thing: fixing the problem they describe.
+
 ## What the extension does on pages
 
 To make video fill the screen, the content script reads the dimensions of
@@ -137,7 +169,7 @@ Page content, form data, passwords and cookies are not read.
 |------------|----------|
 | `storage` | keeping your settings (see the table above) |
 | `alarms` | checking every 6 hours whether your remote config changed — only if you set one |
-| `activeTab` | the popup shows which player type the current tab runs, and the "block this page" button needs the URL |
+| `activeTab` | the popup shows which player type the current tab runs; the "block this page" button needs the URL, and *Report a problem* passes on its domain |
 | site access (`*://*/*`) | video players exist on any site; without this the extension cannot adjust them. To narrow it down, use the URL blacklist or set site access to "on click" in your browser |
 
 `photos.google.com` is explicitly excluded in the manifest; the extension never
@@ -145,8 +177,8 @@ runs there.
 
 ## No selling, no sharing
 
-There is no data to sell or share. There is no server, no account and no
-tracking.
+Nothing is sold or shared. There is no server of this extension, no account and
+no tracking.
 
 ## Questions
 
@@ -194,6 +226,14 @@ deliberately left untouched.
 The toolbar popup shows which player type the current tab is running (native,
 MSE, DRM or iframe) and whether the fill is currently active, which is the
 quickest way to confirm the extension is doing something.
+
+BUG REPORTS / DATA COLLECTION
+data_collection_permissions: required ["none"], optional
+["technicalAndInteraction", "browsingActivity"]. Both are requested with
+permissions.request only when the user ticks "technical details" or "site"
+in the report form on the settings page. The extension never sends a report
+itself: it opens a prefilled GitHub issue (tabs.create) or a mailto: link,
+and the user submits it there.
 
 NETWORK
 By default the extension makes no outbound requests at all. It reads the bundled

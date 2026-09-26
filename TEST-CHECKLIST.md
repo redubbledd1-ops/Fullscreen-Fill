@@ -120,6 +120,13 @@ Alternatief DRM als Netflix niet kan: Disney+/Prime/other — noteer welke.
 | 56 | Chrome: `chrome://extensions` → Details → **Extensie-opties** | Zelfde instellingenpagina in een tab | | |
 | 57 | Instelling wijzigen op de instellingenpagina, popup openen | Popup toont dezelfde waarde | | |
 | 58 | Popup op telefoon | Tekst goed leesbaar zonder inzoomen (≈17px), geen zijwaarts scrollen | | |
+| 59 | Popup → **Probleem melden** | Instellingen openen bij het meldformulier; cursor in "Wat ging er mis?" | | |
+| 60 | Leeg formulier | Beide verzendknoppen grijs | | |
+| 61 | **Technische gegevens** aanvinken (Firefox) | Firefox vraagt zelf toestemming; bij Nee gaat het vinkje weer uit | | |
+| 62 | **Site meesturen** | Alleen het domein (bijv. `youtube.com`) in de voorbeeldtekst, nooit de volledige URL | | |
+| 63 | **Melden via GitHub** | Nieuw tabblad met ingevuld issue; zonder account eerst inloggen, daarna nog steeds ingevuld | | |
+| 64 | **Mailen** (ook op telefoon) | Mail-app opent met onderwerp en tekst aan fullscreenfill@gmail.com | | |
+| 65 | Instellingen direct openen (zonder popup) | Geen "Site meesturen"; melden werkt wel | | |
 
 ---
 

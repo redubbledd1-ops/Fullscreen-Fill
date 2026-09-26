@@ -9,6 +9,10 @@
         color-scheme: dark;
       }
 
+      [hidden] {
+        display: none !important;
+      }
+
       body {
         margin: 0;
         min-width: 320px;
@@ -120,8 +124,34 @@
         margin: 0 auto;
       }
 
-      html.options-view .popup-only {
+      html.options-view .popup-only,
+      html:not(.options-view) .options-only {
         display: none !important;
+      }
+
+      textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 6px 8px;
+        font: inherit;
+        resize: vertical;
+      }
+
+      label.check {
+        margin-top: 10px;
+        font-size: 12px;
+      }
+
+      #reportPreview {
+        margin: 4px 0 0;
+        padding: 8px;
+        max-height: 220px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font: 11px/1.45 ui-monospace, Consolas, monospace;
+        border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+        border-radius: 6px;
       }
 
       .lang-row {
@@ -389,6 +419,20 @@
         .choice {
           font-size: 16px;
         }
+
+        textarea {
+          padding: 8px 12px;
+          font-size: 16px;
+        }
+
+        label.check {
+          font-size: 16px;
+          margin-top: 14px;
+        }
+
+        #reportPreview {
+          font-size: 13px;
+        }
       }
     </style>
   </head>
@@ -482,6 +526,45 @@
       <p class="hint" data-i18n="blacklistHint"></p>
     </details>
 
+    <details id="reportPanel" class="options-only">
+      <summary data-i18n="report">Report a problem</summary>
+      <label class="block" for="reportText" data-i18n="reportWhat">
+        What went wrong?
+      </label>
+      <textarea id="reportText" rows="4" maxlength="2000"></textarea>
+      <label class="block" for="reportDevice" data-i18n="reportDevice">
+        Device (optional)
+      </label>
+      <input
+        type="text"
+        id="reportDevice"
+        maxlength="80"
+        data-i18n-placeholder="reportDevicePlaceholder"
+        autocomplete="off"
+      />
+      <label class="row check" id="reportSiteRow" hidden>
+        <input type="checkbox" id="reportSite" />
+        <span id="reportSiteLabel"></span>
+      </label>
+      <label class="row check">
+        <input type="checkbox" id="reportTech" />
+        <span data-i18n="reportTech">Include technical details</span>
+      </label>
+      <p class="hint" data-i18n="reportTechHint"></p>
+      <p class="meta" data-i18n="reportPreviewLabel"></p>
+      <pre id="reportPreview"></pre>
+      <div class="actions">
+        <button type="button" id="reportGithub" data-i18n="reportGithub">
+          Report on GitHub
+        </button>
+        <button type="button" id="reportMail" data-i18n="reportMail">
+          Send by email
+        </button>
+      </div>
+      <p class="hint" id="reportPublicHint"></p>
+      <p class="meta" id="reportStatus"></p>
+    </details>
+
     <details id="urlCheck">
       <summary data-i18n="urlCheck">URL check</summary>
       <label class="block" for="configUrl" data-i18n="configUrlLabel"></label>
@@ -500,9 +583,16 @@
       <p class="hint" data-i18n="urlCheckHint"></p>
     </details>
 
+    <div class="actions popup-only">
+      <button type="button" id="reportOpen" data-i18n="reportOpen">
+        Report a problem
+      </button>
+    </div>
+
     <script src="browser-api.js"></script>
     <script src="i18n.js"></script>
     <script src="config-client.js"></script>
+    <script src="report.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

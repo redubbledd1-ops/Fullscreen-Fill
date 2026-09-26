@@ -12,6 +12,10 @@ Two modes, picked in the popup:
 In both modes, **Fill from** can leave narrow videos alone: with "5:4 and wider",
 a square clip is shown exactly as the site shows it.
 
+**Report a problem** (popup → settings page) builds a bug report you can read in
+full and send yourself, as a GitHub issue or an email; the site and technical
+details go in only if you tick them. See [PRIVACY.md](PRIVACY.md).
+
 Every setting is in the popup and on the settings page (Add-ons → Fullscreen Fill →
 Settings on Firefox for Android, *Extension options* in Chrome) — the same page,
 minus the parts about the current tab.

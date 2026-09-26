@@ -23,6 +23,7 @@ const SHARED = [
   "i18n.js",
   "popup.html",
   "popup.js",
+  "report.js",
   "options.html",
   "options.js",
   "config",
