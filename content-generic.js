@@ -21,9 +21,10 @@
    *   html/body .ws-fill-fsonly    this site may only fill in fullscreen
    *   html/body .ws-fill-portrait  the biggest video is portrait
    *   html/body .ws-fill-embed     we are inside a player iframe
-   *   html/body .ws-fill-zoom      crop to cover the box instead of stretching
    *   <video data-ws-fill>         a video big enough to be the real player
    *   <video data-ws-portrait>     a video that must not be stretched
+   *   <video data-ws-fit>          fill | cover | contain: how its picture
+   *                                meets the box (stretch, zoom, bars)
    *
    * Sizes come from a ResizeObserver, which hands us the box it already
    * computed, so reading one costs no layout. Fullscreen is not tracked at all:
@@ -39,15 +40,16 @@
   const PORTRAIT = "ws-fill-portrait";
   const FSONLY = "ws-fill-fsonly";
   const EMBED = "ws-fill-embed";
-  const ZOOM = "ws-fill-zoom";
   const MARK = "data-ws-fill";
   const MARK_PORTRAIT = "data-ws-portrait";
+  const FIT = "data-ws-fit";
+  const FILL_KEYS = Object.keys(WsFillConfig.FILL_DEFAULTS);
   const STORAGE_KEY = "enabled";
 
   let enabled = true;
   let urlBlacklist = [];
   let playerTypes = WsFillConfig.defaultPlayerTypes();
-  let fillMode = WsFillConfig.DEFAULT_FILL_MODE;
+  let fillSettings = { ...WsFillConfig.FILL_DEFAULTS };
   let remoteCfg = null;
 
   const inIframe = window !== window.top;
@@ -219,6 +221,19 @@
     return known === undefined ? null : known;
   }
 
+  /** Picture aspect ratio, kept through the 0×0 frames of a seek like above. */
+  const lastRatio = new WeakMap();
+
+  function ratioOf(video) {
+    const w = video.videoWidth;
+    const h = video.videoHeight;
+    if (w > 0 && h > 0) {
+      lastRatio.set(video, w / h);
+      return w / h;
+    }
+    return lastRatio.get(video) || 0;
+  }
+
   // ------------------------------------------------------------------- sizing
 
   /**
@@ -287,8 +302,8 @@
   }
 
   /**
-   * Decide the two attributes for one video. No layout is read: the size comes
-   * from the observer and the orientation from the decoded stream.
+   * Decide the attributes for one video. No layout is read: the size comes
+   * from the observer, the orientation and aspect ratio from the decoded stream.
    */
   function syncVideo(video) {
     if (!video?.isConnected) return;
@@ -306,6 +321,15 @@
 
     if (fill) video.setAttribute(MARK, "1");
     else video.removeAttribute(MARK);
+
+    // Stretch, zoom or bars all keep the box as it is, so choosing between
+    // them from the box cannot feed back into the box.
+    const fit =
+      fill && orientation === false
+        ? WsFillConfig.chooseFit(fillSettings, ratioOf(video), h > 0 ? w / h : 0)
+        : null;
+    if (fit === null) video.removeAttribute(FIT);
+    else if (video.getAttribute(FIT) !== fit) video.setAttribute(FIT, fit);
   }
 
   /** The biggest video we know of, by the size the observer last reported. */
@@ -337,8 +361,6 @@
     body?.classList.toggle(FSONLY, isFullscreenOnlySite());
     root.classList.toggle(EMBED, inIframe && active);
     body?.classList.toggle(EMBED, inIframe && active);
-    root.classList.toggle(ZOOM, active && fillMode === "zoom");
-    body?.classList.toggle(ZOOM, active && fillMode === "zoom");
 
     toggleOverrideActiveClasses(active && !portrait);
   }
@@ -408,6 +430,13 @@
   function observeVideo(video) {
     if (!video || observedVideos.has(video)) return;
     observedVideos.add(video);
+
+    // The picture's own size can change mid-stream (a new representation, an
+    // ad break), and with it the aspect ratio the fit is chosen from.
+    video.addEventListener("resize", () => {
+      syncVideo(video);
+      syncRootFlags();
+    });
 
     if (orientationOf(video) === null) {
       video.addEventListener(
@@ -563,6 +592,7 @@
     const video = primaryVideo();
     const iframe = video ? null : primaryPlayerIframe();
     const type = video ? videoType(video) : iframe ? "embed" : "";
+    const box = video ? boxOf(video) : null;
     return {
       ok: true,
       type,
@@ -573,6 +603,12 @@
       blacklisted: isBlacklistedNow(),
       fullscreenOnly: isFullscreenOnlySite(),
       fullscreen: isFullscreen() || isHintedFullscreen(),
+      fit: video?.getAttribute(FIT) || "",
+      aspectDiff: box?.h
+        ? Math.round(
+            WsFillConfig.aspectDifference(ratioOf(video), box.w / box.h) * 100
+          )
+        : 0,
     };
   }
 
@@ -605,12 +641,12 @@
         [STORAGE_KEY]: true,
         urlBlacklist: [],
         playerTypes: {},
-        fillMode: WsFillConfig.DEFAULT_FILL_MODE,
+        ...WsFillConfig.FILL_DEFAULTS,
       });
       enabled = pref[STORAGE_KEY] !== false;
       urlBlacklist = WsFillConfig.normalizeBlacklist(pref.urlBlacklist || []);
       playerTypes = WsFillConfig.normalizePlayerTypes(pref.playerTypes);
-      fillMode = WsFillConfig.normalizeFillMode(pref.fillMode);
+      fillSettings = WsFillConfig.normalizeFill(pref);
     } catch {
       return;
     }
@@ -629,8 +665,12 @@
       );
       scheduleSync();
     }
-    if (area === "sync" && changes.fillMode) {
-      fillMode = WsFillConfig.normalizeFillMode(changes.fillMode.newValue);
+    if (area === "sync" && FILL_KEYS.some((key) => changes[key])) {
+      const next = { ...fillSettings };
+      for (const key of FILL_KEYS) {
+        if (changes[key]) next[key] = changes[key].newValue;
+      }
+      fillSettings = WsFillConfig.normalizeFill(next);
       scheduleSync();
     }
     if (area === "sync" && changes.urlBlacklist) {

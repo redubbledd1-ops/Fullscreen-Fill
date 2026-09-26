@@ -5,7 +5,9 @@ Chrome/Edge extension that makes **landscape** video fill the screen. Portrait v
 Two modes, picked in the popup:
 
 - **Zoom** (default for now) — the picture is enlarged until the screen is covered; the edges are cropped, nothing is distorted
-- **Stretch** — the whole picture stays visible and is stretched to the screen
+- **Stretch** — the whole picture stays visible and is stretched to the screen,
+  optionally only up to a limit: a video whose shape differs from the screen by
+  more than that (say 4:3 on 16:9, 33%) is zoomed instead, or keeps its bars
 
 ## Download
 

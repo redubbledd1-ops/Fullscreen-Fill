@@ -107,6 +107,12 @@ Alternatief DRM als Netflix niet kan: Disney+/Prime/other — noteer welke.
 | 43 | Modus **Uitrekken**, zelfde video | Scherm vol, hele beeld zichtbaar maar uitgerekt | | |
 | 44 | Modus wisselen tijdens het kijken (ook YouTube fullscreen) | Wisselt direct, zonder tab-reload | | |
 | 45 | Portrait-clip in beide modi | Nooit gezoomd of uitgerekt | | |
+| 46 | Popup: Modus **Zoomen** | "Uitrekken tot" / "Daarboven" verborgen | | |
+| 47 | Uitrekken, grens **Geen grens** | "Daarboven" grijs; alles wordt uitgerekt zoals vóór 1.21 | | |
+| 48 | Uitrekken tot **25%**, daarboven **Balken**, 4:3-clip op 16:9-scherm (33%) | Balken blijven; popup: "balken (33% verschil)" | | |
+| 49 | Zelfde, daarboven **Zoomen** | Gezoomd; popup: "gezoomd (33% verschil)" | | |
+| 50 | Zelfde, grens **33%** | Uitgerekt (33% valt binnen de grens) | | |
+| 51 | Uitrekken tot 25%, 16:9 in fullscreen op 20:9-telefoon (25%) | Uitgerekt | | |
 
 ---
 

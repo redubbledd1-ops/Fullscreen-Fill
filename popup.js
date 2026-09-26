@@ -18,10 +18,15 @@ const reloadTabBtn = document.getElementById("reloadTab");
 const typesSummary = document.getElementById("typesSummary");
 const currentTypeEl = document.getElementById("currentType");
 const modeInputs = document.querySelectorAll('input[name="fillMode"]');
+const limitBlock = document.getElementById("limitBlock");
+const stretchLimitEl = document.getElementById("stretchLimit");
+const overLimitEl = document.getElementById("overLimit");
+const FILL_KEYS = Object.keys(WsFillConfig.FILL_DEFAULTS);
 
 let urlBlacklist = [];
 let pendingTab = null;
 let playerTypes = WsFillConfig.defaultPlayerTypes();
+let fill = { ...WsFillConfig.FILL_DEFAULTS };
 let currentType = "";
 let lastState = null;
 let langPref = "auto";
@@ -74,14 +79,47 @@ function applyLanguage() {
   document.documentElement.lang = locale;
   WsFillI18n.applyDom(document, locale);
   renderLanguages();
+  renderFill();
   renderPlayerTypes();
   renderBlacklist();
   renderCurrentType();
   renderStatus();
 }
 
-function renderFillMode(mode) {
-  for (const input of modeInputs) input.checked = input.value === mode;
+function fillOption(value, text) {
+  const option = document.createElement("option");
+  option.value = String(value);
+  option.textContent = text;
+  return option;
+}
+
+/** Mode, stretch limit and what lies past it: the limit only applies to stretch. */
+function renderFill() {
+  for (const input of modeInputs) input.checked = input.value === fill.fillMode;
+  limitBlock.hidden = fill.fillMode !== "stretch";
+
+  stretchLimitEl.replaceChildren(
+    ...WsFillConfig.STRETCH_LIMITS.map((n) =>
+      fillOption(n, n ? t("limitPercent", { n }) : t("limitNone"))
+    )
+  );
+  stretchLimitEl.value = String(fill.stretchLimit);
+
+  overLimitEl.replaceChildren(
+    ...WsFillConfig.OVER_LIMITS.map((value) =>
+      fillOption(value, t(value === "bars" ? "overBars" : "overZoom"))
+    )
+  );
+  overLimitEl.value = fill.overLimit;
+  overLimitEl.disabled = !fill.stretchLimit;
+}
+
+function saveFill(patch) {
+  fill = WsFillConfig.normalizeFill({ ...fill, ...patch });
+  const values = {};
+  for (const key of Object.keys(patch)) values[key] = fill[key];
+  storageSet(values);
+  renderFill();
 }
 
 function typeMessageKey(type) {
@@ -307,9 +345,18 @@ function renderCurrentType() {
     why = "whyFsOnly";
   } else if (!lastState.active) why = "whyInactive";
 
+  let whyText = t(why);
+  const fitKey = { fill: "fitFill", cover: "fitCover", contain: "fitContain" }[
+    lastState.fit
+  ];
+  if (why === "whyActive" && fitKey) {
+    const n = lastState.aspectDiff || 0;
+    whyText += ` · ${n ? t("fitDiff", { fit: t(fitKey), n }) : t(fitKey)}`;
+  }
+
   currentTypeEl.textContent = t("tabLine", {
     type: typeLabel(lastState.type),
-    why: t(why),
+    why: whyText,
   });
 }
 
@@ -361,12 +408,12 @@ async function bootPopup() {
       urlBlacklist: [],
       playerTypes: {},
       uiLang: "auto",
-      fillMode: WsFillConfig.DEFAULT_FILL_MODE,
+      ...WsFillConfig.FILL_DEFAULTS,
     });
     langPref = result.uiLang || "auto";
     locale = WsFillI18n.resolveLocale(langPref);
     enabledEl.checked = result.enabled !== false;
-    renderFillMode(WsFillConfig.normalizeFillMode(result.fillMode));
+    fill = WsFillConfig.normalizeFill(result);
     urlEl.value = result.configUrl || "";
     playerTypes = WsFillConfig.normalizePlayerTypes(result.playerTypes);
     const normalized = WsFillConfig.normalizeBlacklist(result.urlBlacklist || []);
@@ -410,9 +457,17 @@ enabledEl.addEventListener("change", () => {
 
 for (const input of modeInputs) {
   input.addEventListener("change", () => {
-    if (input.checked) storageSet({ fillMode: input.value });
+    if (input.checked) saveFill({ fillMode: input.value });
   });
 }
+
+stretchLimitEl.addEventListener("change", () => {
+  saveFill({ stretchLimit: Number(stretchLimitEl.value) });
+});
+
+overLimitEl.addEventListener("change", () => {
+  saveFill({ overLimit: overLimitEl.value });
+});
 
 langEl.addEventListener("change", () => {
   langPref = langEl.value || "auto";
@@ -478,8 +533,13 @@ WsFillApi.storage.onChanged.addListener((changes, area) => {
     langPref = changes.uiLang.newValue || "auto";
     applyLanguage();
   }
-  if (changes.fillMode) {
-    renderFillMode(WsFillConfig.normalizeFillMode(changes.fillMode.newValue));
+  if (FILL_KEYS.some((key) => changes[key])) {
+    const next = { ...fill };
+    for (const key of FILL_KEYS) {
+      if (changes[key]) next[key] = changes[key].newValue;
+    }
+    fill = WsFillConfig.normalizeFill(next);
+    renderFill();
   }
   if (changes.playerTypes) {
     playerTypes = WsFillConfig.normalizePlayerTypes(changes.playerTypes.newValue);

@@ -442,17 +442,67 @@ const WsFillConfig = (() => {
     return n;
   }
 
-  /**
-   * How a filled video meets its box. "stretch" distorts the picture to the
-   * box; "zoom" enlarges it until the box is covered and crops what spills
-   * over. The default is this one constant, so it can move back to "stretch"
-   * without touching anything else.
+  /*
+   * How a filled video meets its box — one model, three storage.sync keys,
+   * shared by the popup and the engine:
+   *
+   *   fillMode      "stretch" distorts the picture to the box; "zoom" enlarges
+   *                 it until the box is covered and crops what spills over.
+   *   stretchLimit  stretch mode only: the most distortion allowed, in percent;
+   *                 0 means no limit, which is plain stretch.
+   *   overLimit     what a picture past that limit gets instead: "zoom", or
+   *                 "bars" — left letterboxed as the site had it.
+   *
+   * The defaults are FILL_DEFAULTS, so any of them can move without touching
+   * anything else.
    */
   const FILL_MODES = ["stretch", "zoom"];
-  const DEFAULT_FILL_MODE = "zoom";
+  const STRETCH_LIMITS = [0, 5, 10, 15, 20, 25, 33, 50];
+  const OVER_LIMITS = ["zoom", "bars"];
 
-  function normalizeFillMode(raw) {
-    return FILL_MODES.includes(raw) ? raw : DEFAULT_FILL_MODE;
+  const FILL_DEFAULTS = {
+    fillMode: "zoom",
+    stretchLimit: 0,
+    overLimit: "zoom",
+  };
+
+  /** Pass a storage.sync result (or any object with those keys). */
+  function normalizeFill(raw) {
+    const limit = Number(raw?.stretchLimit);
+    return {
+      fillMode: FILL_MODES.includes(raw?.fillMode)
+        ? raw.fillMode
+        : FILL_DEFAULTS.fillMode,
+      stretchLimit: STRETCH_LIMITS.includes(limit)
+        ? limit
+        : FILL_DEFAULTS.stretchLimit,
+      overLimit: OVER_LIMITS.includes(raw?.overLimit)
+        ? raw.overLimit
+        : FILL_DEFAULTS.overLimit,
+    };
+  }
+
+  /**
+   * How far a picture must be distorted to fill a box exactly: 0.33 means one
+   * axis is stretched a third more than the other. A 4:3 clip on a 16:9 screen
+   * is 0.33, a 21:9 film on 16:9 is 0.31, 16:9 on a 20:9 phone is 0.25 and on
+   * a 16:10 laptop 0.11.
+   */
+  function aspectDifference(pictureRatio, boxRatio) {
+    if (!(pictureRatio > 0) || !(boxRatio > 0)) return 0;
+    return Math.max(pictureRatio, boxRatio) / Math.min(pictureRatio, boxRatio) - 1;
+  }
+
+  /**
+   * The object-fit for one video: "fill" (stretch), "cover" (zoom) or
+   * "contain" (bars). Whole percents, so a 33% limit admits 4:3 on 16:9.
+   */
+  function chooseFit(fill, pictureRatio, boxRatio) {
+    if (fill.fillMode === "zoom") return "cover";
+    if (!fill.stretchLimit) return "fill";
+    const percent = Math.round(aspectDifference(pictureRatio, boxRatio) * 100);
+    if (percent <= fill.stretchLimit) return "fill";
+    return fill.overLimit === "bars" ? "contain" : "cover";
   }
 
   return {
@@ -487,7 +537,11 @@ const WsFillConfig = (() => {
     playerTypeLabel,
     detectPlayerType,
     FILL_MODES,
-    DEFAULT_FILL_MODE,
-    normalizeFillMode,
+    STRETCH_LIMITS,
+    OVER_LIMITS,
+    FILL_DEFAULTS,
+    normalizeFill,
+    aspectDifference,
+    chooseFit,
   };
 })();

@@ -13,13 +13,18 @@
  *
  * How the picture meets the box is one variable, --ws-fill-fit, read by every
  * rule below and by the site entries in the remote config. Stretch (fill) is
- * what it falls back to; the zoom setting swaps in cover, which enlarges the
- * picture until the box is covered and crops what spills over. Neither changes
- * the box itself, so both behave the same everywhere else.
+ * what it falls back to. The script picks per video, from the mode and the
+ * stretch limit, and says so in data-ws-fit: cover enlarges the picture until
+ * the box is covered and crops what spills over, contain leaves the bars. None
+ * of the three changes the box itself, so they behave the same everywhere else.
  */
 
-html.ws-fill-active.ws-fill-zoom {
+video[data-ws-fit="cover"] {
   --ws-fill-fit: cover;
+}
+
+video[data-ws-fit="contain"] {
+  --ws-fill-fit: contain;
 }
 
 /* Landscape fill: fit the picture to the box, removing the bars. */

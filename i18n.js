@@ -18,6 +18,18 @@ const WsFillI18n = (() => {
       modeZoom: "Zoom",
       modeHint:
         "Stretch fills the screen by distorting the picture. Zoom fills it by enlarging the picture and cropping the edges.",
+      limitLabel: "Stretch up to",
+      limitNone: "No limit — always stretch",
+      limitPercent: "{n}% difference",
+      overLabel: "Beyond that",
+      overZoom: "Zoom",
+      overBars: "Keep the bars",
+      limitHint:
+        "The difference between the shape of the video and the screen. 16:9 on a 16:10 laptop ≈ 11%, on a 20:9 phone ≈ 25%; a 4:3 clip or 21:9 film on 16:9 ≈ 31–33%.",
+      fitFill: "stretched",
+      fitCover: "zoomed",
+      fitContain: "bars kept",
+      fitDiff: "{fit} ({n}% difference)",
 
       tabBusy: "Current tab: checking…",
       tabUnknown: "Current tab: unknown (reload the page after updating)",
@@ -90,6 +102,18 @@ const WsFillI18n = (() => {
       modeZoom: "Zoomen",
       modeHint:
         "Uitrekken vult het scherm door het beeld te vervormen. Zoomen vult het door het beeld te vergroten; de randen vallen weg.",
+      limitLabel: "Uitrekken tot",
+      limitNone: "Geen grens — altijd uitrekken",
+      limitPercent: "{n}% verschil",
+      overLabel: "Daarboven",
+      overZoom: "Zoomen",
+      overBars: "Balken laten staan",
+      limitHint:
+        "Het verschil tussen de vorm van de video en die van het scherm. 16:9 op een 16:10-laptop ≈ 11%, op een 20:9-telefoon ≈ 25%; een 4:3-clip of 21:9-film op 16:9 ≈ 31–33%.",
+      fitFill: "uitgerekt",
+      fitCover: "gezoomd",
+      fitContain: "balken",
+      fitDiff: "{fit} ({n}% verschil)",
 
       tabBusy: "Huidige tab: bezig…",
       tabUnknown: "Huidige tab: onbekend (pagina herladen na update)",
@@ -162,6 +186,18 @@ const WsFillI18n = (() => {
       modeZoom: "Zoomen",
       modeHint:
         "Strecken füllt den Bildschirm, indem das Bild verzerrt wird. Zoomen vergrößert das Bild und schneidet die Ränder ab.",
+      limitLabel: "Strecken bis",
+      limitNone: "Keine Grenze – immer strecken",
+      limitPercent: "{n} % Unterschied",
+      overLabel: "Darüber",
+      overZoom: "Zoomen",
+      overBars: "Balken lassen",
+      limitHint:
+        "Der Unterschied zwischen dem Format des Videos und dem des Bildschirms. 16:9 auf einem 16:10-Laptop ≈ 11 %, auf einem 20:9-Handy ≈ 25 %; ein 4:3-Clip oder 21:9-Film auf 16:9 ≈ 31–33 %.",
+      fitFill: "gestreckt",
+      fitCover: "gezoomt",
+      fitContain: "mit Balken",
+      fitDiff: "{fit} ({n} % Unterschied)",
 
       tabBusy: "Aktueller Tab: wird geprüft…",
       tabUnknown: "Aktueller Tab: unbekannt (Seite nach dem Update neu laden)",
@@ -234,6 +270,18 @@ const WsFillI18n = (() => {
       modeZoom: "Zoomer",
       modeHint:
         "Étirer remplit l’écran en déformant l’image. Zoomer l’agrandit et rogne les bords.",
+      limitLabel: "Étirer jusqu’à",
+      limitNone: "Sans limite — toujours étirer",
+      limitPercent: "{n} % d’écart",
+      overLabel: "Au-delà",
+      overZoom: "Zoomer",
+      overBars: "Garder les bandes",
+      limitHint:
+        "L’écart entre le format de la vidéo et celui de l’écran. 16:9 sur un portable 16:10 ≈ 11 %, sur un téléphone 20:9 ≈ 25 % ; un clip 4:3 ou un film 21:9 sur 16:9 ≈ 31–33 %.",
+      fitFill: "étirée",
+      fitCover: "zoomée",
+      fitContain: "bandes gardées",
+      fitDiff: "{fit} ({n} % d’écart)",
 
       tabBusy: "Onglet actuel : vérification…",
       tabUnknown: "Onglet actuel : inconnu (rechargez la page après la mise à jour)",
@@ -306,6 +354,18 @@ const WsFillI18n = (() => {
       modeZoom: "Ampliar",
       modeHint:
         "Estirar llena la pantalla deformando la imagen. Ampliar la agranda y recorta los bordes.",
+      limitLabel: "Estirar hasta",
+      limitNone: "Sin límite: estirar siempre",
+      limitPercent: "{n} % de diferencia",
+      overLabel: "Por encima",
+      overZoom: "Ampliar",
+      overBars: "Dejar las franjas",
+      limitHint:
+        "La diferencia entre el formato del vídeo y el de la pantalla. 16:9 en un portátil 16:10 ≈ 11 %, en un móvil 20:9 ≈ 25 %; un clip 4:3 o una película 21:9 en 16:9 ≈ 31–33 %.",
+      fitFill: "estirado",
+      fitCover: "ampliado",
+      fitContain: "con franjas",
+      fitDiff: "{fit} ({n} % de diferencia)",
 
       tabBusy: "Pestaña actual: comprobando…",
       tabUnknown: "Pestaña actual: desconocida (recarga la página tras actualizar)",
