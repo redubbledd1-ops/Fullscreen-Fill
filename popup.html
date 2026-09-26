@@ -35,6 +35,74 @@
         opacity: 0.9;
       }
 
+      /* Title on the left, the on/off switch on the right. */
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .top h1 {
+        margin: 0;
+      }
+
+      .switch {
+        position: relative;
+        flex-shrink: 0;
+        display: inline-block;
+        width: 38px;
+        height: 22px;
+        cursor: pointer;
+      }
+
+      /* The real checkbox stays, invisible, over the track: clicks, keyboard and
+         screen readers all still go to it. */
+      .switch input[type="checkbox"] {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .switch-track {
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        background: color-mix(in srgb, currentColor 28%, transparent);
+        transition: background 0.15s;
+        pointer-events: none;
+      }
+
+      .switch-track::before {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #e8eaed;
+        transition: transform 0.15s;
+      }
+
+      .switch input:checked + .switch-track {
+        background: #1a73e8;
+      }
+
+      .switch input:checked + .switch-track::before {
+        transform: translateX(16px);
+      }
+
+      .switch input:focus-visible + .switch-track {
+        outline: 2px solid #8ab4f8;
+        outline-offset: 2px;
+      }
+
       label.row {
         display: flex;
         align-items: center;
@@ -325,13 +393,27 @@
         }
 
         h1 {
-          margin-bottom: 14px;
           font-size: 21px;
         }
 
-        label.row {
-          font-size: 19px;
-          gap: 12px;
+        .top {
+          margin-bottom: 14px;
+        }
+
+        .switch {
+          width: 52px;
+          height: 30px;
+        }
+
+        .switch-track::before {
+          top: 4px;
+          left: 4px;
+          width: 22px;
+          height: 22px;
+        }
+
+        .switch input:checked + .switch-track::before {
+          transform: translateX(22px);
         }
 
         input[type="checkbox"],
@@ -437,11 +519,19 @@
     </style>
   </head>
   <body>
-    <h1>Fullscreen Fill</h1>
-    <label class="row">
-      <input type="checkbox" id="enabled" />
-      <span data-i18n="enabled">Widescreen on</span>
-    </label>
+    <header class="top">
+      <h1>Fullscreen Fill</h1>
+      <label class="switch">
+        <input
+          type="checkbox"
+          id="enabled"
+          role="switch"
+          data-i18n-title="enabled"
+          title="Widescreen on"
+        />
+        <span class="switch-track" aria-hidden="true"></span>
+      </label>
+    </header>
 
     <div class="mode-row" role="radiogroup" aria-labelledby="modeLabel">
       <span id="modeLabel" data-i18n="modeLabel">Mode</span>

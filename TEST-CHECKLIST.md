@@ -89,7 +89,7 @@ Alternatief DRM als Netflix niet kan: Disney+/Prime/other — noteer welke.
 
 | # | Scenario | Verwacht | Score | Notitie |
 |---|----------|----------|-------|---------|
-| 18 | Popup: Breedbeeld **uit** | Overal geen stretch | | |
+| 18 | Popup: schuifknop naast de titel **uit** | Overal geen stretch; knop grijs, bolletje links | | |
 | 19 | Blacklist: huidig **domain** | Die site nooit stretch | | |
 | 20 | Blacklist: één YouTube **video** (`ytid:`) | Alleen die video geblokt; andere YT ok | | |
 | 21 | Remote config “Nu controleren” (of bundled) | Geen errors; config-versie zichtbaar | | |
