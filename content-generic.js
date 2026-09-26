@@ -317,7 +317,8 @@
       siteAllowed &&
       orientation !== null &&
       (heldByFullscreen(video) || isPlayerSized(w, h)) &&
-      typeAllowed(video);
+      typeAllowed(video) &&
+      WsFillConfig.isWideEnough(fillSettings, ratioOf(video));
 
     if (fill) video.setAttribute(MARK, "1");
     else video.removeAttribute(MARK);
@@ -604,6 +605,9 @@
       fullscreenOnly: isFullscreenOnlySite(),
       fullscreen: isFullscreen() || isHintedFullscreen(),
       fit: video?.getAttribute(FIT) || "",
+      shapeOff: video
+        ? !WsFillConfig.isWideEnough(fillSettings, ratioOf(video))
+        : false,
       aspectDiff: box?.h
         ? Math.round(
             WsFillConfig.aspectDifference(ratioOf(video), box.w / box.h) * 100

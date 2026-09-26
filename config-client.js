@@ -452,6 +452,9 @@ const WsFillConfig = (() => {
    *                 0 means no limit, which is plain stretch.
    *   overLimit     what a picture past that limit gets instead: "zoom", or
    *                 "bars" — left letterboxed as the site had it.
+   *   minAspect     the narrowest picture that is filled at all, as a ratio
+   *                 name; "any" takes every landscape picture. Anything
+   *                 narrower — a square clip, say — is left as the site shows it.
    *
    * The defaults are FILL_DEFAULTS, so any of them can move without touching
    * anything else.
@@ -459,11 +462,13 @@ const WsFillConfig = (() => {
   const FILL_MODES = ["stretch", "zoom"];
   const STRETCH_LIMITS = [0, 5, 10, 15, 20, 25, 33, 50];
   const OVER_LIMITS = ["zoom", "bars"];
+  const MIN_ASPECTS = { any: 0, "5:4": 5 / 4, "4:3": 4 / 3, "16:10": 16 / 10, "16:9": 16 / 9 };
 
   const FILL_DEFAULTS = {
     fillMode: "zoom",
     stretchLimit: 0,
     overLimit: "zoom",
+    minAspect: "any",
   };
 
   /** Pass a storage.sync result (or any object with those keys). */
@@ -479,7 +484,21 @@ const WsFillConfig = (() => {
       overLimit: OVER_LIMITS.includes(raw?.overLimit)
         ? raw.overLimit
         : FILL_DEFAULTS.overLimit,
+      minAspect: Object.hasOwn(MIN_ASPECTS, raw?.minAspect)
+        ? raw.minAspect
+        : FILL_DEFAULTS.minAspect,
     };
+  }
+
+  /**
+   * Whether a picture is wide enough to be filled at all. Encoders round
+   * (854×480 is 1.779, 1440×1080 is 1.333…), so allow one percent short.
+   * An unknown ratio passes: orientation already holds such a video back.
+   */
+  function isWideEnough(fill, pictureRatio) {
+    const min = MIN_ASPECTS[fill.minAspect] || 0;
+    if (!min || !(pictureRatio > 0)) return true;
+    return pictureRatio >= min * 0.99;
   }
 
   /**
@@ -539,9 +558,11 @@ const WsFillConfig = (() => {
     FILL_MODES,
     STRETCH_LIMITS,
     OVER_LIMITS,
+    MIN_ASPECTS,
     FILL_DEFAULTS,
     normalizeFill,
     aspectDifference,
     chooseFit,
+    isWideEnough,
   };
 })();

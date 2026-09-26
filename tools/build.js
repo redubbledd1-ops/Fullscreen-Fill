@@ -23,6 +23,8 @@ const SHARED = [
   "i18n.js",
   "popup.html",
   "popup.js",
+  "options.html",
+  "options.js",
   "config",
   "icons",
   "_locales",
@@ -56,6 +58,7 @@ function manifestFiles(manifest) {
   };
 
   add(manifest.action?.default_popup);
+  add(manifest.options_ui?.page);
   Object.values(manifest.action?.default_icon || {}).forEach(add);
   Object.values(manifest.icons || {}).forEach(add);
   add(manifest.background?.service_worker);

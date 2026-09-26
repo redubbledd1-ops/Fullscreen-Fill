@@ -27,9 +27,10 @@ Afvinken per regel; datum + bevinding erachter.
 | 2.2 | Mobiele drempels: portret-viewport haalt `mainVideoMinAreaRatio` (0.32) niet — 16:9 op volle breedte ≈ 0.26 | ✅ | `generic.mobile` zet hem op 0.14 |
 | 2.3 | `generic.mobile`-blok in config + oriëntatie-/pointer-detectie in de engine | ✅ | `isMobileViewport()` + `refreshTuning()` per apply |
 | 2.4 | Popup op smal scherm: panelen, dropdown, knoppen bruikbaar met vinger | ✅ | media query op `max-width: 480px` / `pointer: coarse` |
-| 2.5 | Testen op toestel: `web-ext run -t firefox-android` of `about:debugging` via USB | ⬜ | |
+| 2.5 | Testen op toestel: `web-ext run -t firefox-android` of `about:debugging` via USB | ✅ | 2026-09-26, CPH2699 / Firefox 156 via `web-ext run`; knipperen in fullscreen gevonden en opgelost (1.19.3) |
 | 2.6 | Checklist draaien op mobiel; mobiel-specifieke rijen toevoegen | 🟡 | bevinding: knoppen in YouTube-fullscreen reageerden niet — zie onder |
 | 2.7 | Accu/CPU: MutationObserver + 1s-interval meten op telefoon | 🟡 | verborgen tab doet nu niets meer; meten moet nog |
+| 2.8 | Instellingenpagina (Add-ons → Fullscreen Fill → Instellingen) | ✅ | 1.22.0: `options_ui` toont de popup zonder de delen over de huidige tab; popup leesbaar op telefoon (1.21.1) |
 
 ## Fase 3 — Publiceren
 

@@ -18,10 +18,16 @@ const reloadTabBtn = document.getElementById("reloadTab");
 const typesSummary = document.getElementById("typesSummary");
 const currentTypeEl = document.getElementById("currentType");
 const modeInputs = document.querySelectorAll('input[name="fillMode"]');
-const limitBlock = document.getElementById("limitBlock");
+const minAspectEl = document.getElementById("minAspect");
+const stretchOnlyEls = document.querySelectorAll(".stretch-only");
+const overLimitEls = document.querySelectorAll(".over-limit");
 const stretchLimitEl = document.getElementById("stretchLimit");
 const overLimitEl = document.getElementById("overLimit");
 const FILL_KEYS = Object.keys(WsFillConfig.FILL_DEFAULTS);
+
+/** options.html sends the settings page here: the same page, minus the current tab. */
+const isOptionsView =
+  new URLSearchParams(location.search).get("view") === "options";
 
 let urlBlacklist = [];
 let pendingTab = null;
@@ -77,6 +83,9 @@ function renderLanguages() {
 function applyLanguage() {
   locale = WsFillI18n.resolveLocale(langPref);
   document.documentElement.lang = locale;
+  document.title = isOptionsView
+    ? `Fullscreen Fill — ${t("settingsTitle")}`
+    : "Fullscreen Fill";
   WsFillI18n.applyDom(document, locale);
   renderLanguages();
   renderFill();
@@ -93,10 +102,23 @@ function fillOption(value, text) {
   return option;
 }
 
-/** Mode, stretch limit and what lies past it: the limit only applies to stretch. */
+/**
+ * Mode, narrowest picture to fill, stretch limit and what lies past it. The
+ * limit only exists in stretch mode, and "beyond that" only once there is a
+ * limit — hidden rather than greyed out, which is hard to see on a phone.
+ */
 function renderFill() {
   for (const input of modeInputs) input.checked = input.value === fill.fillMode;
-  limitBlock.hidden = fill.fillMode !== "stretch";
+  const stretch = fill.fillMode === "stretch";
+  for (const el of stretchOnlyEls) el.hidden = !stretch;
+  for (const el of overLimitEls) el.hidden = !stretch || !fill.stretchLimit;
+
+  minAspectEl.replaceChildren(
+    ...Object.keys(WsFillConfig.MIN_ASPECTS).map((key) =>
+      fillOption(key, key === "any" ? t("aspectAny") : t("aspectFrom", { r: key }))
+    )
+  );
+  minAspectEl.value = fill.minAspect;
 
   stretchLimitEl.replaceChildren(
     ...WsFillConfig.STRETCH_LIMITS.map((n) =>
@@ -111,7 +133,6 @@ function renderFill() {
     )
   );
   overLimitEl.value = fill.overLimit;
-  overLimitEl.disabled = !fill.stretchLimit;
 }
 
 function saveFill(patch) {
@@ -341,6 +362,7 @@ function renderCurrentType() {
   if (!lastState.enabled) why = "whyOff";
   else if (lastState.blacklisted) why = "whyBlacklisted";
   else if (!lastState.typeAllowed) why = "whyType";
+  else if (!lastState.active && lastState.shapeOff) why = "whyShape";
   else if (!lastState.active && lastState.fullscreenOnly && !lastState.fullscreen) {
     why = "whyFsOnly";
   } else if (!lastState.active) why = "whyInactive";
@@ -428,7 +450,7 @@ async function bootPopup() {
   }
 
   applyLanguage();
-  await loadCurrentType();
+  if (!isOptionsView) await loadCurrentType();
 }
 
 /** Some pages only pick up a changed setting (or an updated extension) on reload. */
@@ -460,6 +482,10 @@ for (const input of modeInputs) {
     if (input.checked) saveFill({ fillMode: input.value });
   });
 }
+
+minAspectEl.addEventListener("change", () => {
+  saveFill({ minAspect: minAspectEl.value });
+});
 
 stretchLimitEl.addEventListener("change", () => {
   saveFill({ stretchLimit: Number(stretchLimitEl.value) });
@@ -552,5 +578,10 @@ WsFillApi.storage.onChanged.addListener((changes, area) => {
     renderBlacklist();
   }
 });
+
+if (isOptionsView) {
+  document.documentElement.classList.add("options-view");
+  for (const panel of document.querySelectorAll("details")) panel.open = true;
+}
 
 bootPopup();

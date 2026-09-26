@@ -19,7 +19,7 @@ const WsFillI18n = (() => {
       modeHint:
         "Stretch fills the screen by distorting the picture. Zoom fills it by enlarging the picture and cropping the edges.",
       limitLabel: "Stretch up to",
-      limitNone: "No limit — always stretch",
+      limitNone: "No limit",
       limitPercent: "{n}% difference",
       overLabel: "Beyond that",
       overZoom: "Zoom",
@@ -30,6 +30,12 @@ const WsFillI18n = (() => {
       fitCover: "zoomed",
       fitContain: "bars kept",
       fitDiff: "{fit} ({n}% difference)",
+      aspectLabel: "Fill from",
+      aspectAny: "Every landscape video",
+      aspectFrom: "{r} and wider",
+      aspectHint:
+        "Narrower videos, square ones for example, are shown normally: the extension leaves them alone.",
+      settingsTitle: "Settings",
 
       tabBusy: "Current tab: checking…",
       tabUnknown: "Current tab: unknown (reload the page after updating)",
@@ -39,6 +45,7 @@ const WsFillI18n = (() => {
       whyOff: "extension off",
       whyBlacklisted: "blacklisted",
       whyType: "this player type is off",
+      whyShape: "this video shape is left as it is",
       whyFsOnly: "fullscreen only",
       whyInactive: "not active right now",
 
@@ -103,7 +110,7 @@ const WsFillI18n = (() => {
       modeHint:
         "Uitrekken vult het scherm door het beeld te vervormen. Zoomen vult het door het beeld te vergroten; de randen vallen weg.",
       limitLabel: "Uitrekken tot",
-      limitNone: "Geen grens — altijd uitrekken",
+      limitNone: "Geen grens",
       limitPercent: "{n}% verschil",
       overLabel: "Daarboven",
       overZoom: "Zoomen",
@@ -114,6 +121,12 @@ const WsFillI18n = (() => {
       fitCover: "gezoomd",
       fitContain: "balken",
       fitDiff: "{fit} ({n}% verschil)",
+      aspectLabel: "Vullen vanaf",
+      aspectAny: "Elke liggende video",
+      aspectFrom: "{r} en breder",
+      aspectHint:
+        "Smallere video’s, bijvoorbeeld vierkante, worden normaal getoond: de extensie doet er dan niets mee.",
+      settingsTitle: "Instellingen",
 
       tabBusy: "Huidige tab: bezig…",
       tabUnknown: "Huidige tab: onbekend (pagina herladen na update)",
@@ -123,6 +136,7 @@ const WsFillI18n = (() => {
       whyOff: "extensie uit",
       whyBlacklisted: "geblacklist",
       whyType: "dit spelertype staat uit",
+      whyShape: "deze videovorm blijft normaal",
       whyFsOnly: "alleen in fullscreen",
       whyInactive: "nu niet actief",
 
@@ -187,7 +201,7 @@ const WsFillI18n = (() => {
       modeHint:
         "Strecken füllt den Bildschirm, indem das Bild verzerrt wird. Zoomen vergrößert das Bild und schneidet die Ränder ab.",
       limitLabel: "Strecken bis",
-      limitNone: "Keine Grenze – immer strecken",
+      limitNone: "Keine Grenze",
       limitPercent: "{n} % Unterschied",
       overLabel: "Darüber",
       overZoom: "Zoomen",
@@ -198,6 +212,12 @@ const WsFillI18n = (() => {
       fitCover: "gezoomt",
       fitContain: "mit Balken",
       fitDiff: "{fit} ({n} % Unterschied)",
+      aspectLabel: "Füllen ab",
+      aspectAny: "Jedes Querformat-Video",
+      aspectFrom: "{r} und breiter",
+      aspectHint:
+        "Schmalere Videos, etwa quadratische, werden normal gezeigt: Die Erweiterung lässt sie in Ruhe.",
+      settingsTitle: "Einstellungen",
 
       tabBusy: "Aktueller Tab: wird geprüft…",
       tabUnknown: "Aktueller Tab: unbekannt (Seite nach dem Update neu laden)",
@@ -207,6 +227,7 @@ const WsFillI18n = (() => {
       whyOff: "Erweiterung aus",
       whyBlacklisted: "auf der Sperrliste",
       whyType: "dieser Playertyp ist aus",
+      whyShape: "diese Videoform bleibt normal",
       whyFsOnly: "nur im Vollbild",
       whyInactive: "derzeit nicht aktiv",
 
@@ -271,7 +292,7 @@ const WsFillI18n = (() => {
       modeHint:
         "Étirer remplit l’écran en déformant l’image. Zoomer l’agrandit et rogne les bords.",
       limitLabel: "Étirer jusqu’à",
-      limitNone: "Sans limite — toujours étirer",
+      limitNone: "Sans limite",
       limitPercent: "{n} % d’écart",
       overLabel: "Au-delà",
       overZoom: "Zoomer",
@@ -282,6 +303,12 @@ const WsFillI18n = (() => {
       fitCover: "zoomée",
       fitContain: "bandes gardées",
       fitDiff: "{fit} ({n} % d’écart)",
+      aspectLabel: "Remplir à partir de",
+      aspectAny: "Toute vidéo en paysage",
+      aspectFrom: "{r} et plus large",
+      aspectHint:
+        "Les vidéos plus étroites, carrées par exemple, s’affichent normalement : l’extension n’y touche pas.",
+      settingsTitle: "Réglages",
 
       tabBusy: "Onglet actuel : vérification…",
       tabUnknown: "Onglet actuel : inconnu (rechargez la page après la mise à jour)",
@@ -291,6 +318,7 @@ const WsFillI18n = (() => {
       whyOff: "extension désactivée",
       whyBlacklisted: "sur la liste noire",
       whyType: "ce type de lecteur est désactivé",
+      whyShape: "ce format de vidéo reste normal",
       whyFsOnly: "plein écran uniquement",
       whyInactive: "inactif pour le moment",
 
@@ -355,7 +383,7 @@ const WsFillI18n = (() => {
       modeHint:
         "Estirar llena la pantalla deformando la imagen. Ampliar la agranda y recorta los bordes.",
       limitLabel: "Estirar hasta",
-      limitNone: "Sin límite: estirar siempre",
+      limitNone: "Sin límite",
       limitPercent: "{n} % de diferencia",
       overLabel: "Por encima",
       overZoom: "Ampliar",
@@ -366,6 +394,12 @@ const WsFillI18n = (() => {
       fitCover: "ampliado",
       fitContain: "con franjas",
       fitDiff: "{fit} ({n} % de diferencia)",
+      aspectLabel: "Rellenar desde",
+      aspectAny: "Cualquier vídeo horizontal",
+      aspectFrom: "{r} o más ancho",
+      aspectHint:
+        "Los vídeos más estrechos, cuadrados por ejemplo, se muestran con normalidad: la extensión no los toca.",
+      settingsTitle: "Ajustes",
 
       tabBusy: "Pestaña actual: comprobando…",
       tabUnknown: "Pestaña actual: desconocida (recarga la página tras actualizar)",
@@ -375,6 +409,7 @@ const WsFillI18n = (() => {
       whyOff: "extensión desactivada",
       whyBlacklisted: "en la lista negra",
       whyType: "este tipo de reproductor está desactivado",
+      whyShape: "este formato de vídeo se queda normal",
       whyFsOnly: "solo en pantalla completa",
       whyInactive: "ahora mismo no está activa",
 

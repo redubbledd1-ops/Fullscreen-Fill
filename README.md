@@ -9,6 +9,13 @@ Two modes, picked in the popup:
   optionally only up to a limit: a video whose shape differs from the screen by
   more than that (say 4:3 on 16:9, 33%) is zoomed instead, or keeps its bars
 
+In both modes, **Fill from** can leave narrow videos alone: with "5:4 and wider",
+a square clip is shown exactly as the site shows it.
+
+Every setting is in the popup and on the settings page (Add-ons → Fullscreen Fill →
+Settings on Firefox for Android, *Extension options* in Chrome) — the same page,
+minus the parts about the current tab.
+
 ## Download
 
 **Chrome / Edge** (until the Chrome Web Store listing is approved):

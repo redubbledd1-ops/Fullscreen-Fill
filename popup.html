@@ -109,6 +109,21 @@
         padding: 4px 6px;
       }
 
+      .limit-grid .hint {
+        grid-column: 1 / -1;
+        margin: 0 0 4px;
+      }
+
+      /* The settings page is this page without the parts about the current tab. */
+      html.options-view body {
+        max-width: 560px;
+        margin: 0 auto;
+      }
+
+      html.options-view .popup-only {
+        display: none !important;
+      }
+
       .lang-row {
         display: flex;
         align-items: center;
@@ -397,14 +412,20 @@
     </div>
     <p class="hint" data-i18n="modeHint"></p>
 
-    <div id="limitBlock" hidden>
-      <div class="limit-grid">
-        <label for="stretchLimit" data-i18n="limitLabel">Stretch up to</label>
-        <select id="stretchLimit"></select>
-        <label for="overLimit" data-i18n="overLabel">Beyond that</label>
-        <select id="overLimit"></select>
-      </div>
-      <p class="hint" data-i18n="limitHint"></p>
+    <div class="limit-grid">
+      <label for="minAspect" data-i18n="aspectLabel">Fill from</label>
+      <select id="minAspect"></select>
+      <p class="hint" data-i18n="aspectHint"></p>
+
+      <label for="stretchLimit" class="stretch-only" data-i18n="limitLabel">
+        Stretch up to
+      </label>
+      <select id="stretchLimit" class="stretch-only"></select>
+      <label for="overLimit" class="over-limit" data-i18n="overLabel">
+        Beyond that
+      </label>
+      <select id="overLimit" class="over-limit"></select>
+      <p class="hint stretch-only" data-i18n="limitHint"></p>
     </div>
 
     <label class="lang-row" for="uiLang">
@@ -414,12 +435,12 @@
 
     <details id="typesPanel">
       <summary id="typesSummary" data-i18n="types">Player types</summary>
-      <p class="meta" id="currentType" data-i18n="tabBusy">
+      <p class="meta popup-only" id="currentType" data-i18n="tabBusy">
         Current tab: checking…
       </p>
       <div id="typeList"></div>
       <p class="hint" data-i18n="typesHint"></p>
-      <div class="actions">
+      <div class="actions popup-only">
         <button type="button" id="reloadTab" data-i18n="reloadTab">
           Reload page
         </button>
@@ -438,12 +459,12 @@
         />
         <button type="button" id="blacklistAdd" data-i18n="add">Add</button>
       </div>
-      <div class="actions">
+      <div class="actions popup-only">
         <button type="button" id="blacklistCurrent" data-i18n="blockCurrent">
           Block current page
         </button>
       </div>
-      <div class="choice" id="currentChoice" hidden>
+      <div class="choice popup-only" id="currentChoice" hidden>
         <p id="currentChoiceText"></p>
         <div class="actions">
           <button type="button" id="chooseUrl" data-i18n="chooseUrl">

@@ -113,6 +113,13 @@ Alternatief DRM als Netflix niet kan: Disney+/Prime/other — noteer welke.
 | 49 | Zelfde, daarboven **Zoomen** | Gezoomd; popup: "gezoomd (33% verschil)" | | |
 | 50 | Zelfde, grens **33%** | Uitgerekt (33% valt binnen de grens) | | |
 | 51 | Uitrekken tot 25%, 16:9 in fullscreen op 20:9-telefoon (25%) | Uitgerekt | | |
+| 52 | Uitrekken tot **Geen grens** | Rij "Daarboven" niet zichtbaar; verschijnt zodra je een grens kiest | | |
+| 53 | Vullen vanaf **5:4 en breder**, vierkante YouTube-video in fullscreen | Normaal beeld, extensie doet niets; popup: "deze videovorm blijft normaal" | | |
+| 54 | Zelfde met **Elke liggende video** | Vierkant wordt weer gezoomd/uitgerekt | | |
+| 55 | Telefoon: Add-ons → Fullscreen Fill → **Instellingen** | Opent instellingen: alle secties open, geen "huidige tab"/"Blokkeer huidige pagina" | | |
+| 56 | Chrome: `chrome://extensions` → Details → **Extensie-opties** | Zelfde instellingenpagina in een tab | | |
+| 57 | Instelling wijzigen op de instellingenpagina, popup openen | Popup toont dezelfde waarde | | |
+| 58 | Popup op telefoon | Tekst goed leesbaar zonder inzoomen (≈17px), geen zijwaarts scrollen | | |
 
 ---
 
