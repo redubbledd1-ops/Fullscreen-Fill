@@ -195,6 +195,26 @@ Report problems or questions through the project's issue tracker:
 <https://github.com/redubbledd1-ops/Fullscreen-Fill/issues>
 ```
 
+## Release notes
+
+Eerste inzending op AMO: alleen `First release on addons.mozilla.org.`
+Latere versies: wat er sinds de vorige AMO-versie veranderde. Voor 1.23.2
+tegenover 1.19.2:
+
+```
+New
+- Zoom mode, now the default: the picture is enlarged until the screen is covered and the edges are cropped, so nothing is distorted. Stretch is still there as a choice.
+- Stretch limit: stretch only up to a difference you pick (5-50%); beyond that the video is zoomed or keeps its bars.
+- "Fill from": leave square or other narrow videos exactly as the site shows them.
+- A settings page (Add-ons > Fullscreen Fill > Settings), also on Firefox for Android.
+- Report a problem from the popup: you see the whole report and send it yourself, by email or as a GitHub issue. The site and technical details are only included if you tick them.
+- The on/off switch now sits next to the title, and the popup says whether a video was stretched, zoomed or kept its bars, and why.
+
+Fixed
+- Flickering and black flashes when a video went fullscreen on phones (YouTube and other sites).
+- Popup text was far too small on Firefox for Android.
+```
+
 ## Notes to Reviewer
 
 ```
@@ -239,9 +259,19 @@ display) and play any normal 16:9 video. Without the extension you get black
 bars left and right; with it the picture fills the width. Portrait video is
 deliberately left untouched.
 
+On YouTube the fill only applies in fullscreen, by design: the windowed YouTube
+player is left exactly as it is. On other sites it also applies to large
+on-page players.
+
 The toolbar popup shows which player type the current tab is running (native,
-MSE, DRM or iframe) and whether the fill is currently active, which is the
-quickest way to confirm the extension is doing something.
+MSE, DRM or iframe), whether the fill is active and whether the video is
+stretched, zoomed or kept its bars - the quickest way to confirm the extension
+is doing something.
+
+SETTINGS PAGE
+options_ui points at options.html, which only does
+location.replace("popup.html?view=options"): the settings page is the popup
+shown without the parts about the current tab, so both stay one page.
 
 BUG REPORTS / DATA COLLECTION
 data_collection_permissions: required ["none"], optional
