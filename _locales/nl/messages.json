@@ -4,7 +4,7 @@
     "description": "Extension name shown in the store and browser."
   },
   "extDesc": {
-    "message": "Rek landscape-video uit tot je hele scherm: geen zwarte balken, geen crop. Werkt op de meeste sites, instelbaar per site.",
+    "message": "Vul je hele scherm met liggende video: zoom of rek de zwarte balken weg. Per site instelbaar, staande video blijft zoals hij is.",
     "description": "Extension description shown in the store."
   }
 }

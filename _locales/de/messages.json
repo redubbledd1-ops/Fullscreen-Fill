@@ -4,7 +4,7 @@
     "description": "Extension name shown in the store and browser."
   },
   "extDesc": {
-    "message": "Querformat-Videos auf den ganzen Bildschirm strecken: ohne schwarze Balken, ohne Zuschnitt. Pro Seite einstellbar.",
+    "message": "Querformat-Videos füllen den ganzen Bildschirm: schwarze Balken wegzoomen oder wegstrecken. Pro Seite einstellbar.",
     "description": "Extension description shown in the store."
   }
 }

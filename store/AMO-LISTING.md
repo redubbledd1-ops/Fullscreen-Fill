@@ -9,10 +9,10 @@ AMO de privacyverklaring als *tekst* wil in plaats van als URL.
 ## Summary (max 250)
 
 ```
-Landscape video stretched to fill your whole window: no black bars, no zoom crop, nothing cut off. Works on most video sites, both in fullscreen and on the page. Turn it off per page or per site whenever you want.
+Landscape video fills your whole screen: zoom in or stretch, no black bars. Square and portrait videos can stay as they are. Works on most video sites, in fullscreen and on the page. Turn it off per page or per site.
 ```
 
-213 tekens. AMO zegt erbij dat reviewers dit veld gebruiken om te bepalen wat ze
+216 tekens. AMO zegt erbij dat reviewers dit veld gebruiken om te bepalen wat ze
 testen, maar het staat vooral in zoekresultaten bij gewone gebruikers. Daar zegt
 "MSE" niemand iets. De technische opsomming hoort in *Notes to Reviewer*: dat
 veld is privé en heeft geen limiet.
@@ -20,9 +20,15 @@ veld is privé en heeft geen limiet.
 ## Description
 
 ```markdown
-Fullscreen Fill stretches landscape video so it fills your screen instead of
-leaving black bars on a 21:9 or ultrawide display. It stretches — it does not
-zoom and crop — so nothing is cut off the top, bottom or sides.
+Fullscreen Fill makes landscape video fill your screen instead of leaving
+black bars — on a 21:9 or ultrawide monitor, a 16:10 laptop or a phone.
+
+**Two ways to fill**
+
+* **Zoom** (default): the picture is enlarged until the screen is covered. The
+  edges are cropped; nothing is distorted.
+* **Stretch**: the whole picture stays visible and is stretched to the screen —
+  optionally only up to a limit you set, with zoom or the original bars beyond it.
 
 **What it works on**
 
@@ -33,31 +39,34 @@ zoom and crop — so nothing is cut off the top, bottom or sides.
 
 **What it leaves alone**
 
-* Portrait video is never stretched
-* Small previews and thumbnails are ignored
+* Portrait video, always
+* Square or other narrow video, if you set *Fill from*
+* Small previews and thumbnails
 * Any page, site or player type you switch off yourself
 
 **Staying in control**
 
-The popup shows which player type the current tab is running and whether the
-fill is active, so you can see why something did or did not change. Turn it off
-for a single page, a whole domain, or a player type you never want it on.
+The popup shows what happened on the current tab — stretched, zoomed or bars
+kept, and why — so you can see why something did or did not change. Every
+setting is also on the settings page, on desktop and on Firefox for Android.
 
 The interface follows your browser language — English, Dutch, German, French or
 Spanish — and can be switched by hand.
 
+Something wrong? *Report a problem* in the popup builds a report you can read in
+full and send yourself, as a GitHub issue or an email.
+
 No accounts, no analytics, nothing sent in the background. Bug reports are
 written and sent by you, with device or site details only if you tick them.
-The only network request the
-extension can make is fetching a configuration URL that you enter yourself, and
-that field is empty until you fill it in.
+The only network request the extension can make is fetching a configuration URL
+that you enter yourself, and that field is empty until you fill it in.
 ```
 
 ## Aanvinkvelden
 
 | Veld | Antwoord | Waarom |
 |------|----------|--------|
-| This add-on is experimental | **nee** | "Experimental" verbergt hem uit zoekresultaten en zet een waarschuwing op de pagina. Dit is 1.19.2, geen proefballon. |
+| This add-on is experimental | **nee** | "Experimental" verbergt hem uit zoekresultaten en zet een waarschuwing op de pagina. Dit is een uitgewerkte versie, geen proefballon. |
 | Requires payment / hardware | **nee** | Gratis, geen account, geen externe dienst. |
 
 ## Categorieën (max 3, kies er 2)
@@ -213,6 +222,13 @@ created. It does not read, decode, capture, record or save any video data, and
 it has no access to the protected stream. DRM players are a separate "type"
 purely because they need different CSS rules, not because the extension
 interacts with the protection.
+
+MODES
+Zoom is the default: object-fit: cover, which crops the edges. Stretch
+(object-fit: fill) is a setting in the popup and on the settings page, with an
+optional limit past which a video is zoomed or keeps its bars. "Fill from"
+leaves narrow (e.g. square) videos untouched. Outside fullscreen the generic
+engine only changes object-fit; the element keeps the size the page gave it.
 
 HOW TO SEE IT WORKING
 The extension only acts when the video's aspect ratio differs from the window,

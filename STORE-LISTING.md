@@ -12,56 +12,76 @@ moeten gelijk blijven.
 
 ## Korte omschrijving (max 132 tekens, Chrome)
 
-**NL** — Rek landscape-video uit tot je hele scherm: geen zwarte balken, geen crop. Werkt op de meeste sites, instelbaar per site.
+**NL** — Vul je hele scherm met liggende video: zoom of rek de zwarte balken weg. Per site instelbaar, staande video blijft zoals hij is.
 
-**EN** — Stretch landscape video to fill your whole screen: no black bars, no zoom crop. Works on most sites, adjustable per site.
+**EN** — Fill your whole screen with landscape video: zoom or stretch away the black bars. Per-site control, portrait video left alone.
 
 ## Lange omschrijving (EN)
 
 ```
-Fullscreen Fill stretches landscape video so it fills your screen instead of
-leaving black bars on a 21:9 or ultrawide display. It stretches - it does not
-zoom and crop - so nothing is cut off the top, bottom or sides.
+Fullscreen Fill makes landscape video fill your screen instead of leaving
+black bars - on a 21:9 or ultrawide monitor, a 16:10 laptop or a phone.
+
+Two ways to fill, your choice:
+- Zoom (default): the picture is enlarged until the screen is covered. The
+  edges are cropped; nothing is distorted.
+- Stretch: the whole picture stays visible and is stretched to the screen -
+  optionally only up to a limit you set, with zoom or the original bars
+  beyond it.
 
 - Works on regular HTML5 players, MSE players (YouTube and most streaming
   sites), protected DRM players and players inside iframes.
-- Portrait video is never stretched.
+- Portrait video is never touched, and with "Fill from" square or other
+  narrow videos stay exactly as the site shows them.
 - Small previews and thumbnails are left alone.
 - Turn it off for a single page, a whole domain, or a player type you do not
   want it on.
-- The popup shows which player type the current tab is running and whether
-  widescreen is active, so you can see why something did or did not change.
-- Interface follows your browser language (English, Dutch, German, French,
-  Spanish) and can be switched by hand.
+- The popup shows what happened on the current tab - stretched, zoomed or bars
+  kept, and why - so you can see why something did or did not change.
+- A settings page on desktop and on Firefox for Android. The interface follows
+  your browser language (English, Dutch, German, French, Spanish) and can be
+  switched by hand.
+- Report a problem from the popup: you see the whole report and send it
+  yourself, as a GitHub issue or an email.
 
 No accounts, no analytics, nothing sent in the background. Bug reports are
 written and sent by you, with device or site details only if you tick them.
-The only network request the
-extension can make is fetching a configuration URL that you enter yourself.
+The only network request the extension can make is fetching a configuration
+URL that you enter yourself.
 ```
 
 ## Lange omschrijving (NL)
 
 ```
-Fullscreen Fill rekt landscape-video uit tot je scherm gevuld is, in plaats van
-zwarte balken op een 21:9- of ultrawide-monitor. Het rekt uit - het zoomt niet in
-en snijdt niet bij - dus er valt niets weg aan de boven-, onder- of zijkant.
+Fullscreen Fill laat liggende video je hele scherm vullen, in plaats van
+zwarte balken - op een 21:9- of ultrawide-monitor, een 16:10-laptop of een
+telefoon.
+
+Twee manieren om te vullen, jij kiest:
+- Zoomen (standaard): het beeld wordt vergroot tot het scherm vol is. De randen
+  vallen weg; niets wordt vervormd.
+- Uitrekken: het hele beeld blijft zichtbaar en wordt uitgerekt tot het scherm -
+  desgewenst alleen tot een grens die je zelf kiest, met daarboven zoomen of de
+  oorspronkelijke balken.
 
 - Werkt op gewone HTML5-spelers, MSE-spelers (YouTube en de meeste
   streamingsites), beveiligde DRM-spelers en spelers in een iframe.
-- Verticale video wordt nooit uitgerekt.
+- Staande video blijft altijd zoals hij is, en met "Vullen vanaf" blijven ook
+  vierkante of andere smalle video's precies zoals de site ze toont.
 - Kleine previews en thumbnails blijven met rust.
 - Uit te zetten per pagina, per domein, of per spelertype.
-- De popup toont welk spelertype de huidige tab draait en of breedbeeld actief
-  is, zodat je ziet waarom er wel of niets verandert.
-- De interface volgt je browsertaal (Nederlands, Engels, Duits, Frans, Spaans)
-  en is handmatig te wisselen.
+- De popup toont wat er op de huidige tab gebeurde - uitgerekt, gezoomd of
+  balken, en waarom - zodat je ziet waarom er wel of niets verandert.
+- Een instellingenpagina op de computer en in Firefox voor Android. De
+  interface volgt je browsertaal (Nederlands, Engels, Duits, Frans, Spaans) en
+  is handmatig te wisselen.
+- Een probleem melden kan vanuit de popup: je ziet de hele melding en verstuurt
+  hem zelf, als GitHub-issue of per mail.
 
-Geen account, geen analytics, niets op de achtergrond verstuurd. Meldingen schrijf
-en verstuur je zelf, met toestel- of sitegegevens alleen als je die aanvinkt.
-Het enige netwerkverzoek
-dat de extensie kan doen is het ophalen van een configuratie-URL die je zelf
-invult.
+Geen account, geen analytics, niets op de achtergrond verstuurd. Meldingen
+schrijf en verstuur je zelf, met toestel- of sitegegevens alleen als je die
+aanvinkt. Het enige netwerkverzoek dat de extensie kan doen is het ophalen van
+een configuratie-URL die je zelf invult.
 ```
 
 ---

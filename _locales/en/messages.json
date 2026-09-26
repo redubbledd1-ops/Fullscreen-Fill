@@ -4,7 +4,7 @@
     "description": "Extension name shown in the store and browser."
   },
   "extDesc": {
-    "message": "Stretch landscape video to fill your whole screen: no black bars, no zoom crop. Works on most sites, adjustable per site.",
+    "message": "Fill your whole screen with landscape video: zoom or stretch away the black bars. Per-site control, portrait video left alone.",
     "description": "Extension description shown in the store."
   }
 }

@@ -4,7 +4,7 @@
     "description": "Extension name shown in the store and browser."
   },
   "extDesc": {
-    "message": "Étire les vidéos en paysage sur tout l'écran : sans bandes noires ni recadrage. Réglable site par site.",
+    "message": "Remplissez tout l’écran avec vos vidéos en paysage : zoomez ou étirez pour chasser les bandes noires. Réglable site par site.",
     "description": "Extension description shown in the store."
   }
 }

@@ -4,7 +4,7 @@
     "description": "Extension name shown in the store and browser."
   },
   "extDesc": {
-    "message": "Estira los vídeos horizontales a toda la pantalla: sin barras negras ni recorte. Ajustable sitio por sitio.",
+    "message": "Llena toda la pantalla con vídeos horizontales: amplía o estira para quitar las barras negras. Ajustable sitio por sitio.",
     "description": "Extension description shown in the store."
   }
 }
