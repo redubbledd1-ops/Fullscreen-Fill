@@ -442,6 +442,19 @@ const WsFillConfig = (() => {
     return n;
   }
 
+  /**
+   * How a filled video meets its box. "stretch" distorts the picture to the
+   * box; "zoom" enlarges it until the box is covered and crops what spills
+   * over. The default is this one constant, so it can move back to "stretch"
+   * without touching anything else.
+   */
+  const FILL_MODES = ["stretch", "zoom"];
+  const DEFAULT_FILL_MODE = "zoom";
+
+  function normalizeFillMode(raw) {
+    return FILL_MODES.includes(raw) ? raw : DEFAULT_FILL_MODE;
+  }
+
   return {
     isValid,
     loadDefaults,
@@ -473,5 +486,8 @@ const WsFillConfig = (() => {
     isPlayerTypeEnabled,
     playerTypeLabel,
     detectPlayerType,
+    FILL_MODES,
+    DEFAULT_FILL_MODE,
+    normalizeFillMode,
   };
 })();

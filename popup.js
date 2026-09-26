@@ -17,6 +17,7 @@ const typeList = document.getElementById("typeList");
 const reloadTabBtn = document.getElementById("reloadTab");
 const typesSummary = document.getElementById("typesSummary");
 const currentTypeEl = document.getElementById("currentType");
+const modeInputs = document.querySelectorAll('input[name="fillMode"]');
 
 let urlBlacklist = [];
 let pendingTab = null;
@@ -77,6 +78,10 @@ function applyLanguage() {
   renderBlacklist();
   renderCurrentType();
   renderStatus();
+}
+
+function renderFillMode(mode) {
+  for (const input of modeInputs) input.checked = input.value === mode;
 }
 
 function typeMessageKey(type) {
@@ -356,10 +361,12 @@ async function bootPopup() {
       urlBlacklist: [],
       playerTypes: {},
       uiLang: "auto",
+      fillMode: WsFillConfig.DEFAULT_FILL_MODE,
     });
     langPref = result.uiLang || "auto";
     locale = WsFillI18n.resolveLocale(langPref);
     enabledEl.checked = result.enabled !== false;
+    renderFillMode(WsFillConfig.normalizeFillMode(result.fillMode));
     urlEl.value = result.configUrl || "";
     playerTypes = WsFillConfig.normalizePlayerTypes(result.playerTypes);
     const normalized = WsFillConfig.normalizeBlacklist(result.urlBlacklist || []);
@@ -400,6 +407,12 @@ reloadTabBtn.addEventListener("click", async () => {
 enabledEl.addEventListener("change", () => {
   storageSet({ enabled: enabledEl.checked });
 });
+
+for (const input of modeInputs) {
+  input.addEventListener("change", () => {
+    if (input.checked) storageSet({ fillMode: input.value });
+  });
+}
 
 langEl.addEventListener("change", () => {
   langPref = langEl.value || "auto";
@@ -464,6 +477,9 @@ WsFillApi.storage.onChanged.addListener((changes, area) => {
   if (changes.uiLang) {
     langPref = changes.uiLang.newValue || "auto";
     applyLanguage();
+  }
+  if (changes.fillMode) {
+    renderFillMode(WsFillConfig.normalizeFillMode(changes.fillMode.newValue));
   }
   if (changes.playerTypes) {
     playerTypes = WsFillConfig.normalizePlayerTypes(changes.playerTypes.newValue);

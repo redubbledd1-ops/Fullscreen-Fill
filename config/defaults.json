@@ -1,6 +1,6 @@
 {
-  "version": 16,
-  "updatedAt": "2026-09-22",
+  "version": 17,
+  "updatedAt": "2026-09-26",
   "generic": {
     "mainVideoMinAreaRatio": 0.32,
     "mainVideoMinWidthRatio": 0.5,
@@ -31,7 +31,7 @@
         "m.youtube.com",
         "music.youtube.com"
       ],
-      "css": "body.yt-fill-active .html5-video-player.ytp-fullscreen .html5-video-container{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;left:0!important;top:0!important;transform:none!important}body.yt-fill-active .html5-video-player.ytp-fullscreen .html5-video-container video,body.yt-fill-active .html5-video-player.ytp-fullscreen video.html5-main-video{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;left:0!important;top:0!important;max-width:none!important;max-height:none!important;transform:none!important;object-fit:fill!important;object-position:center center!important}",
+      "css": "body.yt-fill-active .html5-video-player.ytp-fullscreen .html5-video-container{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;left:0!important;top:0!important;transform:none!important}body.yt-fill-active .html5-video-player.ytp-fullscreen .html5-video-container video,body.yt-fill-active .html5-video-player.ytp-fullscreen video.html5-main-video{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;left:0!important;top:0!important;max-width:none!important;max-height:none!important;transform:none!important;object-fit:var(--ws-fill-fit,fill)!important;object-position:center center!important}",
       "activeClass": "yt-fill-active",
       "fullscreenOnly": true,
       "fullscreenHint": {
@@ -46,7 +46,7 @@
     {
       "id": "netflix",
       "match": "netflix.com",
-      "css": "html.ws-fill-active:not(.ws-fill-portrait) .watch-video video,html.ws-fill-active:not(.ws-fill-portrait) .watch-video--player-view video,html.ws-fill-active:not(.ws-fill-portrait) [data-uia=\"video-canvas\"] video,html.ws-fill-active:not(.ws-fill-portrait) .nfp video{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:fill!important;object-position:center center!important}"
+      "css": "html.ws-fill-active:not(.ws-fill-portrait) .watch-video video,html.ws-fill-active:not(.ws-fill-portrait) .watch-video--player-view video,html.ws-fill-active:not(.ws-fill-portrait) [data-uia=\"video-canvas\"] video,html.ws-fill-active:not(.ws-fill-portrait) .nfp video{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:var(--ws-fill-fit,fill)!important;object-position:center center!important}"
     },
     {
       "id": "tvsportslive",

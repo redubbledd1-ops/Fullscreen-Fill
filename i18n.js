@@ -13,6 +13,11 @@ const WsFillI18n = (() => {
       langLabel: "Language",
       langAuto: "Automatic (browser language)",
       enabled: "Widescreen on",
+      modeLabel: "Mode",
+      modeStretch: "Stretch",
+      modeZoom: "Zoom",
+      modeHint:
+        "Stretch fills the screen by distorting the picture. Zoom fills it by enlarging the picture and cropping the edges.",
 
       tabBusy: "Current tab: checking…",
       tabUnknown: "Current tab: unknown (reload the page after updating)",
@@ -80,6 +85,11 @@ const WsFillI18n = (() => {
       langLabel: "Taal",
       langAuto: "Automatisch (browsertaal)",
       enabled: "Breedbeeld aan",
+      modeLabel: "Modus",
+      modeStretch: "Uitrekken",
+      modeZoom: "Zoomen",
+      modeHint:
+        "Uitrekken vult het scherm door het beeld te vervormen. Zoomen vult het door het beeld te vergroten; de randen vallen weg.",
 
       tabBusy: "Huidige tab: bezig…",
       tabUnknown: "Huidige tab: onbekend (pagina herladen na update)",
@@ -147,6 +157,11 @@ const WsFillI18n = (() => {
       langLabel: "Sprache",
       langAuto: "Automatisch (Browsersprache)",
       enabled: "Breitbild an",
+      modeLabel: "Modus",
+      modeStretch: "Strecken",
+      modeZoom: "Zoomen",
+      modeHint:
+        "Strecken füllt den Bildschirm, indem das Bild verzerrt wird. Zoomen vergrößert das Bild und schneidet die Ränder ab.",
 
       tabBusy: "Aktueller Tab: wird geprüft…",
       tabUnknown: "Aktueller Tab: unbekannt (Seite nach dem Update neu laden)",
@@ -214,6 +229,11 @@ const WsFillI18n = (() => {
       langLabel: "Langue",
       langAuto: "Automatique (langue du navigateur)",
       enabled: "Plein format activé",
+      modeLabel: "Mode",
+      modeStretch: "Étirer",
+      modeZoom: "Zoomer",
+      modeHint:
+        "Étirer remplit l’écran en déformant l’image. Zoomer l’agrandit et rogne les bords.",
 
       tabBusy: "Onglet actuel : vérification…",
       tabUnknown: "Onglet actuel : inconnu (rechargez la page après la mise à jour)",
@@ -281,6 +301,11 @@ const WsFillI18n = (() => {
       langLabel: "Idioma",
       langAuto: "Automático (idioma del navegador)",
       enabled: "Pantalla ancha activada",
+      modeLabel: "Modo",
+      modeStretch: "Estirar",
+      modeZoom: "Ampliar",
+      modeHint:
+        "Estirar llena la pantalla deformando la imagen. Ampliar la agranda y recorta los bordes.",
 
       tabBusy: "Pestaña actual: comprobando…",
       tabUnknown: "Pestaña actual: desconocida (recarga la página tras actualizar)",

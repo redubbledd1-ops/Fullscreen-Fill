@@ -59,6 +59,36 @@
         font: inherit;
       }
 
+      .mode-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 10px;
+        font-size: 12px;
+      }
+
+      .mode-row > span {
+        opacity: 0.85;
+      }
+
+      .mode-row label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      input[type="radio"] {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+      }
+
+      .mode-row + .hint {
+        margin-top: 4px;
+      }
+
       .lang-row {
         display: flex;
         align-items: center;
@@ -224,9 +254,14 @@
           padding: 16px;
         }
 
-        input[type="checkbox"] {
+        input[type="checkbox"],
+        input[type="radio"] {
           width: 22px;
           height: 22px;
+        }
+
+        .mode-row {
+          font-size: 15px;
         }
 
         button,
@@ -269,6 +304,19 @@
       <input type="checkbox" id="enabled" />
       <span data-i18n="enabled">Widescreen on</span>
     </label>
+
+    <div class="mode-row" role="radiogroup" aria-labelledby="modeLabel">
+      <span id="modeLabel" data-i18n="modeLabel">Mode</span>
+      <label>
+        <input type="radio" name="fillMode" value="stretch" />
+        <span data-i18n="modeStretch">Stretch</span>
+      </label>
+      <label>
+        <input type="radio" name="fillMode" value="zoom" />
+        <span data-i18n="modeZoom">Zoom</span>
+      </label>
+    </div>
+    <p class="hint" data-i18n="modeHint"></p>
 
     <label class="lang-row" for="uiLang">
       <span data-i18n="langLabel">Language</span>

@@ -6,15 +6,25 @@
  * portrait clips stay exactly as the site had them.
  *
  * Outside fullscreen nothing here changes the size or position of anything. The
- * <video> keeps the box the player gave it and only the picture is stretched to
- * fill that box. Growing the element was what used to fight the player's own
+ * <video> keeps the box the player gave it and only the picture is fitted to
+ * that box. Growing the element was what used to fight the player's own
  * layout — a site whose player letterboxes by sizing the element itself gets a
  * css entry in the remote config instead of a guess made here.
+ *
+ * How the picture meets the box is one variable, --ws-fill-fit, read by every
+ * rule below and by the site entries in the remote config. Stretch (fill) is
+ * what it falls back to; the zoom setting swaps in cover, which enlarges the
+ * picture until the box is covered and crops what spills over. Neither changes
+ * the box itself, so both behave the same everywhere else.
  */
 
-/* Landscape fill: stretch the picture to the box, removing the bars. */
+html.ws-fill-active.ws-fill-zoom {
+  --ws-fill-fit: cover;
+}
+
+/* Landscape fill: fit the picture to the box, removing the bars. */
 html.ws-fill-active:not(.ws-fill-fsonly) video[data-ws-fill]:not([data-ws-portrait]) {
-  object-fit: fill !important;
+  object-fit: var(--ws-fill-fit, fill) !important;
   object-position: center center !important;
 }
 
@@ -29,7 +39,7 @@ html.ws-fill-active:not(.ws-fill-fsonly) video[data-ws-fill]:not([data-ws-portra
 
 /* The video element is itself the fullscreen element: the UA already sizes it. */
 html.ws-fill-active video[data-ws-fill]:not([data-ws-portrait]):fullscreen {
-  object-fit: fill !important;
+  object-fit: var(--ws-fill-fit, fill) !important;
   object-position: center center !important;
 }
 
@@ -54,7 +64,7 @@ html.ws-fill-active :fullscreen :where(video[data-ws-fill]:not([data-ws-portrait
   height: 100% !important;
   max-width: none !important;
   max-height: none !important;
-  object-fit: fill !important;
+  object-fit: var(--ws-fill-fit, fill) !important;
   object-position: center center !important;
 }
 

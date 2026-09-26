@@ -21,6 +21,7 @@
    *   html/body .ws-fill-fsonly    this site may only fill in fullscreen
    *   html/body .ws-fill-portrait  the biggest video is portrait
    *   html/body .ws-fill-embed     we are inside a player iframe
+   *   html/body .ws-fill-zoom      crop to cover the box instead of stretching
    *   <video data-ws-fill>         a video big enough to be the real player
    *   <video data-ws-portrait>     a video that must not be stretched
    *
@@ -38,6 +39,7 @@
   const PORTRAIT = "ws-fill-portrait";
   const FSONLY = "ws-fill-fsonly";
   const EMBED = "ws-fill-embed";
+  const ZOOM = "ws-fill-zoom";
   const MARK = "data-ws-fill";
   const MARK_PORTRAIT = "data-ws-portrait";
   const STORAGE_KEY = "enabled";
@@ -45,6 +47,7 @@
   let enabled = true;
   let urlBlacklist = [];
   let playerTypes = WsFillConfig.defaultPlayerTypes();
+  let fillMode = WsFillConfig.DEFAULT_FILL_MODE;
   let remoteCfg = null;
 
   const inIframe = window !== window.top;
@@ -334,6 +337,8 @@
     body?.classList.toggle(FSONLY, isFullscreenOnlySite());
     root.classList.toggle(EMBED, inIframe && active);
     body?.classList.toggle(EMBED, inIframe && active);
+    root.classList.toggle(ZOOM, active && fillMode === "zoom");
+    body?.classList.toggle(ZOOM, active && fillMode === "zoom");
 
     toggleOverrideActiveClasses(active && !portrait);
   }
@@ -600,10 +605,12 @@
         [STORAGE_KEY]: true,
         urlBlacklist: [],
         playerTypes: {},
+        fillMode: WsFillConfig.DEFAULT_FILL_MODE,
       });
       enabled = pref[STORAGE_KEY] !== false;
       urlBlacklist = WsFillConfig.normalizeBlacklist(pref.urlBlacklist || []);
       playerTypes = WsFillConfig.normalizePlayerTypes(pref.playerTypes);
+      fillMode = WsFillConfig.normalizeFillMode(pref.fillMode);
     } catch {
       return;
     }
@@ -620,6 +627,10 @@
       playerTypes = WsFillConfig.normalizePlayerTypes(
         changes.playerTypes.newValue
       );
+      scheduleSync();
+    }
+    if (area === "sync" && changes.fillMode) {
+      fillMode = WsFillConfig.normalizeFillMode(changes.fillMode.newValue);
       scheduleSync();
     }
     if (area === "sync" && changes.urlBlacklist) {

@@ -1,6 +1,11 @@
 # Fullscreen Fill
 
-Chrome/Edge extension that stretches **landscape** video to fill the screen (full picture visible, no zoom/crop). Portrait video is left unchanged.
+Chrome/Edge extension that makes **landscape** video fill the screen. Portrait video is left unchanged.
+
+Two modes, picked in the popup:
+
+- **Zoom** (default for now) — the picture is enlarged until the screen is covered; the edges are cropped, nothing is distorted
+- **Stretch** — the whole picture stays visible and is stretched to the screen
 
 ## Download
 
@@ -52,7 +57,7 @@ One generic engine + remote overrides. No site-specific content scripts.
 | Field | Meaning |
 |-------|---------|
 | `match` | host, `host/path`, `re:regex`, or an array of these |
-| `css` | injected polish CSS |
+| `css` | injected polish CSS — write `object-fit:var(--ws-fill-fit,fill)`, never a fixed value, so the mode setting still applies |
 | `fullscreenOnly` | only stretch in (hinted) fullscreen |
 | `fullscreenHint` | CSS class on the player = fullscreen |
 | `activeClass` | body/html class while stretch is active |

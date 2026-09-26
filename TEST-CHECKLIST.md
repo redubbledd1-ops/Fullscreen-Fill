@@ -102,6 +102,11 @@ Alternatief DRM als Netflix niet kan: Disney+/Prime/other — noteer welke.
 | 28 | Taal handmatig wisselen in de dropdown | Alles hertaalt direct, ook lijsten, badges en statusregel | | |
 | 29 | Taal na popup opnieuw openen | Keuze onthouden (sync) | | |
 | 30 | Browsertaal zonder vertaling (bijv. pl) | Valt terug op Engels, geen lege knoppen | | |
+| 41 | Verse installatie, popup openen | Modus staat op **Zoomen** | | |
+| 42 | Modus **Zoomen**, 21:9-film of 4:3-clip in fullscreen | Scherm vol, niets vervormd; randen vallen weg | | |
+| 43 | Modus **Uitrekken**, zelfde video | Scherm vol, hele beeld zichtbaar maar uitgerekt | | |
+| 44 | Modus wisselen tijdens het kijken (ook YouTube fullscreen) | Wisselt direct, zonder tab-reload | | |
+| 45 | Portrait-clip in beide modi | Nooit gezoomd of uitgerekt | | |
 
 ---
 
