@@ -37,6 +37,9 @@ const reportGithub = document.getElementById("reportGithub");
 const reportMail = document.getElementById("reportMail");
 const reportPublicHint = document.getElementById("reportPublicHint");
 const reportStatus = document.getElementById("reportStatus");
+const resetRow = document.getElementById("resetRow");
+const resetBtn = document.getElementById("resetAll");
+const resetStatus = document.getElementById("resetStatus");
 
 /** options.html sends the settings page here: the same page, minus the current tab. */
 const isOptionsView =
@@ -633,6 +636,74 @@ refreshBtn.addEventListener("click", async () => {
   await renderStatus();
 });
 
+// ------------------------------------------------------------------ reset
+
+/**
+ * Every key the user can set. Removing a key rather than writing its default
+ * means the popup, the content scripts and the background all fall back to
+ * the defaults they already carry, so there is one list of defaults, not two.
+ */
+const SETTING_KEYS = [
+  "enabled",
+  "configUrl",
+  "urlBlacklist",
+  "playerTypes",
+  "uiLang",
+  ...FILL_KEYS,
+];
+const RESET_CONFIRM_MS = 4000;
+let resetTimer = 0;
+
+function disarmReset() {
+  clearTimeout(resetTimer);
+  resetTimer = 0;
+  resetBtn.classList.remove("confirm");
+  resetBtn.textContent = t("resetAll");
+}
+
+async function resetAll() {
+  disarmReset();
+  resetBtn.disabled = true;
+  try {
+    await WsFillApi.storage.sync.remove(SETTING_KEYS);
+  } catch {
+    /* storage unavailable: still show the defaults */
+  }
+
+  enabledEl.checked = true;
+  fill = { ...WsFillConfig.FILL_DEFAULTS };
+  playerTypes = WsFillConfig.defaultPlayerTypes();
+  urlBlacklist = [];
+  urlEl.value = "";
+  langPref = "auto";
+  hideChoice();
+  applyLanguage();
+
+  resetStatus.textContent = t("resetDone");
+  resetStatus.hidden = false;
+  resetBtn.disabled = false;
+
+  // Without a config URL the background goes back to the bundled config.
+  try {
+    await WsFillApi.runtime.sendMessage({ type: "refreshConfig" });
+  } catch {
+    /* background asleep: it refreshes on its own schedule */
+  }
+  renderStatus();
+}
+
+// No confirm(): Firefox for Android does not show dialogs from a popup.
+resetBtn.addEventListener("click", () => {
+  if (!resetTimer) {
+    resetBtn.classList.add("confirm");
+    resetBtn.textContent = t("resetConfirm");
+    resetStatus.hidden = true;
+    resetTimer = setTimeout(disarmReset, RESET_CONFIRM_MS);
+    return;
+  }
+  resetAll();
+});
+
 /**
  * The report form lives on the settings page, which is a real tab: room to
  * type, and Firefox's consent prompt cannot close it the way it can a popup.
@@ -736,6 +807,7 @@ WsFillApi.storage.onChanged.addListener((changes, area) => {
 
 if (isOptionsView) {
   document.documentElement.classList.add("options-view");
+  reportPanel.before(resetRow);
   for (const panel of document.querySelectorAll("details")) panel.open = true;
 }
 

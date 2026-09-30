@@ -215,6 +215,13 @@ Fixed
 - Popup text was far too small on Firefox for Android.
 ```
 
+Voor 1.24.0 tegenover 1.23.2:
+
+```
+New
+- "Reset all settings" button next to "Report a problem" (and on the settings page): puts every setting back to its default in one go. It asks for a second tap first, so it cannot happen by accident.
+```
+
 ## Notes to Reviewer
 
 ```

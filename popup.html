@@ -327,6 +327,27 @@
         cursor: pointer;
       }
 
+      /* Reset and report share one row under a line, each half the width. */
+      .bottom-row {
+        margin-top: 12px;
+        border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+      }
+
+      .bottom-row .actions {
+        flex-wrap: nowrap;
+      }
+
+      .bottom-row button {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      /* Reset asks twice; the second tap is the one that clears. */
+      #resetAll.confirm {
+        color: #ff8a80;
+        border-color: #ff8a80;
+      }
+
       .choice {
         display: none;
         margin-top: 8px;
@@ -673,10 +694,24 @@
       <p class="hint" data-i18n="urlCheckHint"></p>
     </details>
 
-    <div class="actions popup-only">
-      <button type="button" id="reportOpen" data-i18n="reportOpen">
-        Report a problem
-      </button>
+    <!-- Reset and report side by side, under a line. On the settings page the
+         report button is hidden and popup.js moves this row above the report
+         panel. -->
+    <div id="resetRow" class="bottom-row">
+      <div class="actions">
+        <button type="button" id="resetAll" data-i18n="resetAll">
+          Reset all settings
+        </button>
+        <button
+          type="button"
+          id="reportOpen"
+          class="popup-only"
+          data-i18n="reportOpen"
+        >
+          Report a problem
+        </button>
+      </div>
+      <p class="meta" id="resetStatus" hidden></p>
     </div>
 
     <script src="browser-api.js"></script>
